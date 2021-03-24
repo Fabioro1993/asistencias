@@ -1,0 +1,46 @@
+{
+  "menu": [
+    {
+      "url": "/",
+      "name": "Inicio",
+      "i18n": "inicio",
+      "class": "waves-effect waves-cyan",
+      "icon": "bookmark_border",
+      "slug": "inicio"
+    },
+    {
+      "url": "javascript:void(0)",
+      "name": "Registro",
+      "i18n": "Registro",
+      "class": "collapsible-header waves-effect waves-cyan",
+      "slug": "Registro",
+      "icon": "assignment",
+      "submenu": [
+        {
+          "url": "historico",
+          "name": "Historico",
+          "i18n": "historico",
+          "slug": "historico"
+        },
+        {
+          "url": "registro",
+          "name": "Nuevo",
+          "i18n": "Nuevo",
+          "slug": "nuevo"
+        }
+      ]
+    },
+    {
+      "navheader": "Configuración",
+      "icon": "more_horiz"
+    },
+    {
+      "url": "administracion",
+      "name": "Administración",
+      "i18n": "Administracion",
+      "class": "waves-effect waves-cyan",
+      "icon": "settings",
+      "slug": "Administracion"
+    }
+  ]
+}
