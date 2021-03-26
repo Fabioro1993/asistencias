@@ -22,6 +22,7 @@ class RegistroEditComponent extends Component
     public $adicionales_input = array();
     public $asistencia_input = array();
     public $cant_trabaj = array();
+    public $empr_trabaj = array();    
 
     public function mount($id)
     {
@@ -73,11 +74,17 @@ class RegistroEditComponent extends Component
 
         $oso = $this->data->registro_det;
 
-        $nmtrabajador    = Nmtrabajdor::select(DB::raw('CONCAT(NOMBRE, " ", APELLIDO) AS nombre, CEDULA AS cedula'))->get();
+        foreach (Auth::user()->permiso as $key => $value) {
+            
+            $gerencia[] = $value->gerencia;
+            $ubicacion[] = $value->ubicacion;
+        }  
         
+        $nmtrabajador = RegistroCab::trabajador()->whereIn('depto', $gerencia)->whereIn('ubicacion', $ubicacion);
+
         foreach ($nmtrabajador as $key => $value) {
-            $cedulas_nmtrab[] = $value->cedula;
-            $nmtrab[$value->cedula] = $value->nombre;
+            $cedulas_nmtrab[] = $value->CEDULA;
+            $nmtrab[$value->CEDULA] = $value->NOMBRE;
         }
         
         $resultado = array_diff($cedulas_nmtrab, $this->cedula_reg);
@@ -89,9 +96,12 @@ class RegistroEditComponent extends Component
         if (!isset($this->recargar)) { 
 
             foreach ($this->data->registro_det as $key => $value) {
-
-                $this->cant_trabaj[$value->cedula] = $value->nombre;
-                $this->comentario[$value->cedula] = $value->comentario;
+                
+                $this->cant_trabaj[$value->cedula]   = $value->nombre;
+                $this->empr_trabaj[$value->cedula][] = $value->empresa;
+                $this->empr_trabaj[$value->cedula][] = $value->gerencia;
+                $this->empr_trabaj[$value->cedula][] = $value->ubicacion;
+                $this->comentario[$value->cedula]    = $value->comentario;
                 $this->adicionales_input[$value->cedula] = null;
                 
 
@@ -115,12 +125,18 @@ class RegistroEditComponent extends Component
             }
             //EXISTEN NUEVO TRABAJADOR
             if (count($resultado) >= 1) {
+
                 foreach ($resultado as $key_resl => $val_resl) {
+
+                    $new_trab = RegistroCab::trabajador()->whereIn('CEDULA', $val_resl)->first();
+                    
                     $this->comentario[$val_resl] = null;
                     $this->adicionales_input[$val_resl] = null;
-
                     $this->cant_trabaj[$val_resl] = $nmtrab[$val_resl];
-                    //dd($this->cant_trabaj, $resultado, $nmtrab);
+
+                    $this->empr_trabaj[$val_resl][] = $new_trab->empresa;
+                    $this->empr_trabaj[$val_resl][] = $new_trab->depto;
+                    $this->empr_trabaj[$val_resl][] = $new_trab->ubicacion;
                     
                     foreach ($evaluaciones as $key => $evaluacion) {
                         $this->asistencia_input[$val_resl][$evaluacion->id_evaluacion] = null;
@@ -129,7 +145,6 @@ class RegistroEditComponent extends Component
                     
                     foreach ($this->eval_reg as $key => $value) {
                         
-                        //$this->evaluacion[$val_resl][$value] = null;
                         $this->select_val[$val_resl] = '0_'.$val_resl;
                         $this->input_sel[$val_resl]  = null;
                     }

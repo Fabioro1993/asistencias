@@ -17,10 +17,10 @@ use Illuminate\Support\Facades\DB;
 class UserRegistroComponent extends Component
 {
     //$id_usuario, $name, $email, $rol_id,  $estado_id,  $rol_input, $estado_input, $indicador, 
-    public $username, $new_name, $new_email, $estado, $rol, $permiso;
+    public $username, $new_name, $new_email, $estado, $rol, $permiso, $id_usuario,  $rol_input, $estado_input;
     public $accion = 'ver';
 
-    protected $listeners = ['newPost'];
+    protected $listeners = ['editUser'];
 
     public function render()
     {
@@ -31,6 +31,10 @@ class UserRegistroComponent extends Component
         $ubicacion = Nmtrabajdor::select('UBICACION')->where('UBICACION', '!=', null)->groupby('UBICACION')->get();
 
         $dptos = Nmdpto::all();
+
+        if ($this->accion == 'ver') {
+            $this->permiso = null;
+        }
         
         return view('livewire.user-registro-component', compact('data', 'roles', 'estados', 'ubicacion', 'dptos'));
     }
@@ -86,28 +90,91 @@ class UserRegistroComponent extends Component
             }
     
             $this->accion = 'ver';
-            $this->reset(['estado', 'rol', 'new_email', 'username', 'new_name']); 
-            $this->dispatchBrowserEvent('contentChanged');
+            $this->reset(['estado', 'rol', 'new_email', 'username', 'new_name', 'permiso']); 
+            $this->dispatchBrowserEvent('contentChanged'); //REINICIAR SELECT
 
             DB::commit();
+            $this->emit('User');//ACTUALIZAR TABLA DE REGISTROS UserComponent
         } catch (\Throwable $th) {
             DB::rollback();
             throw $th;
         }
     }
 
-   
-    public function newPost(User $usuario)
+    public function update()
     {
-        //$this->id_usuario   = $usuario->id;
+        try {
+            DB::beginTransaction();
+            $users = User::find($this->id_usuario);
+
+            if ($this->rol_input != null) {
+                $users->id_rol = $this->rol_input;
+            }
+
+            if ($this->estado_input != null) {
+                $users->id_estado = $this->estado_input;
+            }
+            
+            foreach ($this->permiso as $dpto => $val) {
+                
+                foreach ($val as $ubic => $value) { 
+
+                    $permiso = Permisos::where('id', $this->id_usuario)
+                                    ->where('gerencia', $dpto)
+                                    ->where('ubicacion', $ubic)->first();
+
+                    if (isset($permiso)) {
+                        if ($value == false) {
+                            $permiso_delete = Permisos::find($permiso->id_permiso);
+                            $permiso_delete->delete();
+                        }
+                    } else {
+
+                        $permiso_new                = new Permisos();
+                        $permiso_new->id            = $users->id;
+                        $permiso_new->gerencia      = $dpto;
+                        $permiso_new->ubicacion     = $ubic;
+                        $permiso_new->save();
+                    }
+                }
+            }
+
+            $users->save();
+            
+            DB::commit();
+            $this->accion = 'ver';
+            $this->reset(['estado', 'rol', 'new_email', 'username', 'new_name']); 
+            $this->dispatchBrowserEvent('contentChanged'); //REINICIAR SELECT
+        } catch (\Throwable $th) {
+            DB::rollback();
+            throw $th;
+        }
+    }
+    
+    public function editUser(User $usuario)
+    {
+        $this->permiso = null;
+        $permiso = Permisos::where('id', $usuario->id)->get();
+        foreach ($permiso as $key => $value) {
+
+            $this->permiso[$value->gerencia][$value->ubicacion] = true;
+        }
+        
+        $this->id_usuario   = $usuario->id;
         $this->new_name     = $usuario->name;
         $this->username     = $usuario->username;
         $this->new_email    = $usuario->email;
         $this->rol          = $usuario->id_rol;
         $this->estado       = $usuario->id_estado;
-        $this->accion       = 'update'; 
-
-        $this->dispatchBrowserEvent('contentChanged');
+        $this->accion       = 'update';
         
+        $this->dispatchBrowserEvent('contentChanged');
+    }
+
+    public function cancelar()
+    {
+        $this->accion = 'ver';
+        $this->reset(['estado', 'rol', 'new_email', 'username', 'new_name']); 
+        $this->dispatchBrowserEvent('contentChanged'); //REINICIAR SELECT
     }
 }

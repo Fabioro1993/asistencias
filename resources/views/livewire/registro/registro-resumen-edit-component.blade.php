@@ -23,18 +23,18 @@
            <tbody>
             @foreach($oso as $det)
             <tr>
-               <td class="center">{{$det->cedula}}</td>
-               <td style="font-size: 11px;">{{$det->nombre}}</td> 
-               <td class="center">{{$resumen_edit['resumen_asistencia'][$det->cedula]}}</td>
-               <td class="center">{{$resumen_edit['resumen_faltajust'][$det->cedula]}}</td>
-               <td class="center">{{$resumen_edit['resumen_vacacion'][$det->cedula]}}</td>
-               <td class="center">{{$resumen_edit['resumen_hx_diurna'][$det->cedula]}}</td>
-               <td class="center">{{$resumen_edit['resumen_hx_nocturna'][$det->cedula]}}</td>
-               <td class="center">{{$resumen_edit['bono_nocturno'][$det->cedula]}}</td>
-               <td class="center">{{$resumen_edit['adicionales'][$det->cedula]}}</td>                
-               <td class="center">{{$resumen_edit['resumen_gd_sabado'][$det->cedula]}}</td>               
-               <td class="center">{{$resumen_edit['resumen_gd_domingo'][$det->cedula]}}</td> 
-               <td class="center">{{$resumen_edit['resumen_gd_totales'][$det->cedula]}}</td>           
+               <td class="center">{{$det->CEDULA}}</td>
+               <td style="font-size: 11px;">{{$det->NOMBRE}}</td> 
+               <td class="center">{{$resumen_edit['resumen_asistencia'][$det->CEDULA]}}</td>
+               <td class="center">{{$resumen_edit['resumen_faltajust'][$det->CEDULA]}}</td>
+               <td class="center">{{$resumen_edit['resumen_vacacion'][$det->CEDULA]}}</td>
+               <td class="center">{{$resumen_edit['resumen_hx_diurna'][$det->CEDULA]}}</td>
+               <td class="center">{{$resumen_edit['resumen_hx_nocturna'][$det->CEDULA]}}</td>
+               <td class="center">{{$resumen_edit['bono_nocturno'][$det->CEDULA]}}</td>
+               <td class="center">{{$resumen_edit['adicionales'][$det->CEDULA]}}</td>                
+               <td class="center">{{$resumen_edit['resumen_gd_sabado'][$det->CEDULA]}}</td>               
+               <td class="center">{{$resumen_edit['resumen_gd_domingo'][$det->CEDULA]}}</td> 
+               <td class="center">{{$resumen_edit['resumen_gd_totales'][$det->CEDULA]}}</td>           
             </tr>
             @endforeach
            </tbody>

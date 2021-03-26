@@ -24,6 +24,7 @@ class RegistroComponent extends Component
     public $adicionales_input = array();
     public $evaluacion = array();
     public $cant_trabaj = array();
+    public $empr_trabaj = array();
 
     public $resumen_asistencia = array(); 
     public $resumen_faltajust = array(); 
@@ -60,9 +61,18 @@ class RegistroComponent extends Component
         
         
         $fin_sem = RegistroCab::finSemana(null);
+        
+        
 
-        //$oso = Oso::all();
-        $this->oso    = Nmtrabajdor::all();
+        foreach (Auth::user()->permiso as $key => $value) {
+            
+            $gerencia[] = $value->gerencia;
+            $ubicacion[] = $value->ubicacion;
+            
+        }  
+        
+        $this->oso = RegistroCab::trabajador()->whereIn('depto', $gerencia)->whereIn('ubicacion', $ubicacion);
+        
         $evaluaciones = Evaluacion::whereIn('id_evaluacion', [1, 2, 3,4])->get();
         $select       = Evaluacion::whereIn('id_evaluacion', [5,6,7,8])->get();
         
@@ -83,7 +93,12 @@ class RegistroComponent extends Component
             $this->fecha     = $this->fecha_min;            
 
             foreach ($this->oso as $key => $value) {
-                $this->cant_trabaj[$value->CEDULA]          = $value->NOMBRE.' '.$value->APELLIDO;
+                $this->cant_trabaj[$value->CEDULA]          = $value->NOMBRE;
+
+                $this->empr_trabaj[$value->CEDULA][]          = $value->empresa;
+                $this->empr_trabaj[$value->CEDULA][]          = $value->depto;
+                $this->empr_trabaj[$value->CEDULA][]          = $value->ubicacion;
+                
                 $this->resumen_gd_totales[$value->CEDULA]   = null;
                 $this->comentario[$value->CEDULA]           = null;
                 $this->adicionales[$value->CEDULA]          = null;
@@ -353,9 +368,6 @@ class RegistroComponent extends Component
         foreach ($this->adicionales_input as $key => $value) {
             $this->asistencia_input[$key][11] = ($value == null) ? 0 : $value ;
         }
-        if (session('empresa') == null ) {
-            return redirect()->to('/');
-        }
         
         try {
             DB::beginTransaction();
@@ -365,15 +377,18 @@ class RegistroComponent extends Component
             $registro_cab->fecha        = $this->fecha;
             $registro_cab->observacion  = $this->observacion;
             $registro_cab->id_estado    = $estado;
-            $registro_cab->empresa      = session('empresa');
             $registro_cab->save();
             
             foreach ($this->cant_trabaj as $cedula => $value) {
+                
                 $registro_det                = new RegistroDet();
-                $registro_det->id_registro   =  $registro_cab->id_registro;
+                $registro_det->id_registro   = $registro_cab->id_registro;
                 $registro_det->cedula        = $cedula;
                 $registro_det->nombre        = $value;
                 $registro_det->comentario    = $this->comentario[$cedula];
+                $registro_det->empresa       = $this->empr_trabaj[$cedula][0];
+                $registro_det->gerencia      = $this->empr_trabaj[$cedula][1];
+                $registro_det->ubicacion     = $this->empr_trabaj[$cedula][2];
                 $registro_det->save();
                 
                 foreach ($this->asistencia_input[$cedula] as $id_eval => $resul) {

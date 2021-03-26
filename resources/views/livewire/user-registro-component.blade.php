@@ -84,7 +84,11 @@
                 <button type="submit" class="btn indigo" wire:click="store">Guardar</button>
             </div>
             @elseif ( $accion == 'update')
-            <div class="col s12 display-flex justify-content-end mt-3">
+            <div class="col offset-s8 s2 display-flex justify-content-end mt-3">
+                <a class="btn red waves-effect waves-light left"
+                    wire:click="cancelar">Cancelar</a>
+            </div>
+            <div class="col s2 display-flex justify-content-end mt-3">
                 <button type="submit" class="btn indigo" wire:click="update">Actualizar</button>
             </div>
             @endif
@@ -94,6 +98,7 @@
 
 @push('script')
 <script>
+    //REINICIAR SELECT
     window.addEventListener('contentChanged', event => {
         var elems = document.querySelectorAll('select');
         var instances = M.FormSelect.init(elems);

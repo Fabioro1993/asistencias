@@ -19,8 +19,6 @@ class CreateRegistrosCabTable extends Migration
             $table->foreignId('id')->references('id')->on('users');
             $table->string('observacion')->nullable();
             $table->foreignId('id_estado')->references('id_estado')->on('estados');            
-            $table->string('empresa');
-            $table->string('gerencia');
             $table->timestamps();
             $table->softDeletes();
         });

@@ -55,32 +55,32 @@
                             <tbody>
                                 @foreach($oso as $p_oso)
                                 <tr>
-                                    <td class="center">{{$p_oso->cedula}}</td>
-                                    <td style="font-size: 11px;">{{$p_oso->nombre }}</td>                                            
+                                    <td class="center">{{$p_oso->CEDULA}}</td>
+                                    <td style="font-size: 11px;">{{$p_oso->NOMBRE }}</td>                                            
                                     <td>
-                                        <select class="select2 browser-default" wire:model="asistencia" id="{{ $p_oso->cedula }}"
+                                        <select class="select2 browser-default" wire:model="asistencia" id="{{ $p_oso->CEDULA }}"
                                         wire:ignore>
-                                            <option value="0_{{ $p_oso->cedula }}">0</option>
-                                            <option value="1_{{ $p_oso->cedula }}">1</option>
+                                            <option value="0_{{ $p_oso->CEDULA }}">0</option>
+                                            <option value="1_{{ $p_oso->CEDULA }}">1</option>
                                             @foreach($select as $estado)
-                                                <option value="{{ $estado->id_evaluacion }}_{{ $p_oso->cedula }}"> {{ $estado->abrv }}</option>
+                                                <option value="{{ $estado->id_evaluacion }}_{{ $p_oso->CEDULA }}"> {{ $estado->abrv }}</option>
                                             @endforeach
                                         </select>
                                     </td>
                                     @for ($i = 1; $i < count($evaluaciones); $i++)
                                         <td>
                                             <input type="number" min="1" max="{{$evaluaciones[$i]->max}}" class="evaluacion"
-                                            wire:model.defer="evaluacion.{{ $p_oso->cedula }}.{{$evaluaciones[$i]->id_evaluacion}}"
-                                            wire:keyup="evaluacion({{$p_oso->cedula}}, '{{$evaluaciones[$i]->id_evaluacion}}')">
+                                            wire:model.defer="evaluacion.{{ $p_oso->CEDULA }}.{{$evaluaciones[$i]->id_evaluacion}}"
+                                            wire:keyup="evaluacion({{$p_oso->CEDULA}}, '{{$evaluaciones[$i]->id_evaluacion}}')">
                                         </td> 
                                     @endfor
                                     <td>
-                                        <input id="comentario" type="text" class="validate" wire:model.defer='comentario.{{ $p_oso->cedula }}'>
+                                        <input id="comentario" type="text" class="validate" wire:model.defer='comentario.{{ $p_oso->CEDULA }}'>
                                     </td>
                                     <td {{$hidden}}>
                                         <input type="number" min="2" max="6" class="adicionales"
-                                        wire:model.defer="adicionales.{{ $p_oso->cedula }}"
-                                        wire:keyup="adicionales({{$p_oso->cedula}})">
+                                        wire:model.defer="adicionales.{{ $p_oso->CEDULA }}"
+                                        wire:keyup="adicionales({{$p_oso->CEDULA}})">
                                     </td>
                                 </tr>
                                 @endforeach

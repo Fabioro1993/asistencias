@@ -35,7 +35,7 @@ class Historico extends Component
         $pageConfigs = ['pageHeader' => true];
 
         $data = RegistroCab::select(DB::raw('MONTH(fecha) mes'), DB::raw('YEAR(fecha) anio'))
-                            ->where('empresa', session('empresa'))
+                            //->where('empresa', session('empresa'))
                             ->groupby('mes', 'anio')->get();
 
         foreach ($data as $key => $value) {

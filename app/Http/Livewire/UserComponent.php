@@ -19,6 +19,8 @@ class UserComponent extends Component
     public $id_usuario, $name, $username, $email, $rol_id, $estado_id, $rol_input, $estado_input, $indicador, $new_name, $new_email, $estado, $rol;
     public $accion = 'ver';
 
+    protected $listeners = ['User'];
+
     public function render()
     {
         $data = User::with('estado', 'rol')->get();
@@ -31,8 +33,27 @@ class UserComponent extends Component
         
         return view('livewire.user-component', compact('data', 'roles', 'estados', 'ubicacion', 'dptos'));
     }
+    
+    //Enviar ID de usuario a Component UserRegistro newPost
+    public function showPost($id)
+    {
+        $this->emit('editUser', $id); //USER REGISTRO
+        //$this->emit('PestActiv');
+    }
 
-    // public function buscar()
+    public function showUser($id)
+    {
+        //$this->emit('editUser', $id); //USER REGISTRO
+        $this->emit('PestActiv');
+    }
+    
+    public function User()
+    {
+        //actualizar componente de lista de usuarios (este)
+        $this->emit('PestActiv');
+    }
+
+     // public function buscar()
     // {
     //     $this->reset(['new_name', 'new_email', 'accion']);
     //     $users = ldapUS::where('samaccountname', $this->username)->first();
@@ -70,37 +91,4 @@ class UserComponent extends Component
     //     $this->reset(['estado', 'rol', 'new_email', 'username', 'new_name']); 
     //     $this->dispatchBrowserEvent('contentChanged');
     // }
-
-    public function edit(User $usuario)
-    {
-        $this->id_usuario   = $usuario->id;
-        $this->name         = $usuario->name;
-        $this->indicador    = $usuario->username;
-        $this->email        = $usuario->email;
-        $this->rol_id       = $usuario->id_rol;
-        $this->estado_id    = $usuario->id_estado;
-
-        $this->dispatchBrowserEvent('contentChanged');
-    }
-
-    public function update()
-    {
-        $users = User::find($this->id_usuario);
-
-        if ($this->rol_input != null) {
-            $users->id_rol = $this->rol_input;
-        }
-
-        if ($this->estado_input != null) {
-            $users->id_estado = $this->estado_input;
-        }
-        $users->save();
-    }
-
-    //Enviar ID de usuario a Component UserRegistro newPost
-    public function showPost($id)
-    {
-        $this->emit('PestActiv');
-        $this->emit('newPost', $id);
-    }
 }

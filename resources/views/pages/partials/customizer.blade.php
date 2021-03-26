@@ -29,7 +29,7 @@
             @foreach($oso as $p_oso)
             <tr>
                <td class="center">{{$p_oso->CEDULA}}</td>
-               <td style="font-size: 11px;">{{$p_oso->NOMBRE }} {{$p_oso->APELLIDO}}</td>                                            
+               <td style="font-size: 11px;">{{$p_oso->NOMBRE }}</td>                                            
                <td>{{$resumen_asistencia[$p_oso->CEDULA]}}</td>
                <td>{{$resumen_faltajust[$p_oso->CEDULA]}}</td>
                <td>{{$resumen_vacacion[$p_oso->CEDULA]}}</td>

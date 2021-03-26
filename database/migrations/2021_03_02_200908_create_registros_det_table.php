@@ -18,6 +18,9 @@ class CreateRegistrosDetTable extends Migration
             $table->foreignId('id_registro')->references('id_registro')->on('registros_cab');
             $table->integer('cedula');
             $table->string('nombre');
+            $table->string('empresa');
+            $table->string('gerencia');
+            $table->string('ubicacion');
             $table->string('comentario')->nullable();
             $table->timestamps();
             $table->softDeletes();

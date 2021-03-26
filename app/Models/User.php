@@ -73,4 +73,9 @@ class User extends Authenticatable implements LdapAuthenticatable
     {
         return $this->belongsTo(Rol::class, 'id_rol');
     }
+
+    public function permiso()
+    {
+        return $this->hasMany(Permisos::class, 'id');
+    }
 }

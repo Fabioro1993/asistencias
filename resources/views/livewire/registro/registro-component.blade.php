@@ -65,7 +65,7 @@
                                 @foreach($oso as $p_oso)
                                 <tr>
                                     <td class="center">{{$p_oso->CEDULA}}</td>
-                                    <td style="font-size: 11px;">{{$p_oso->NOMBRE }} {{$p_oso->APELLIDO}}</td>                                            
+                                    <td style="font-size: 11px;">{{$p_oso->NOMBRE }}</td>                                            
                                     <td>
                                         <select class="select2 browser-default" wire:model="asistencia" id="{{ $p_oso->CEDULA }}"
                                         wire:ignore>
