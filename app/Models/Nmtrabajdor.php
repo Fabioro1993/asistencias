@@ -18,7 +18,8 @@ class Nmtrabajdor extends Model
 
     //protected $connection = 'oso';
     
-    protected $table = 'nmtrabajador';
+    //protected $table = 'nmtrabajador';
+    protected $table = 'oso_trabajador';
     protected $primaryKey = 'CEDULA';
     public $incrementing = false;
 }

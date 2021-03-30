@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire;
 
+use App\Models\Nmdpto;
 use Livewire\Component;
 use App\Models\Evaluacion;
 use App\Models\Nmtrabajdor;
@@ -59,17 +60,13 @@ class RegistroComponent extends Component
         //Pageheader set true for breadcrumbs
         $pageConfigs = ['pageHeader' => true];
         
-        
         $fin_sem = RegistroCab::finSemana(null);
-        
-        
-
-        foreach (Auth::user()->permiso as $key => $value) {
+        $user = User::with('permiso')->find(Auth::user()->id);
+        foreach ($user->permiso as $key => $value) {
             
             $gerencia[] = $value->gerencia;
             $ubicacion[] = $value->ubicacion;
-            
-        }  
+        } 
         
         $this->oso = RegistroCab::trabajador()->whereIn('depto', $gerencia)->whereIn('ubicacion', $ubicacion);
         

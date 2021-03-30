@@ -1,5 +1,6 @@
 <?php 
 return [
+    "Cargar nomina" => "Cargar nomina",
     "Nuevo" => "Nuevo",
     "Inicio" => "Inicio",
     "Historico" => "Historico",

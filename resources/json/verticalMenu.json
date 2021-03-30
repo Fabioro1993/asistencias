@@ -27,6 +27,12 @@
           "name": "Nuevo",
           "i18n": "Nuevo",
           "slug": "nuevo"
+        },
+        {
+          "url": "nomina",
+          "name": "Cargar nomina",
+          "i18n": "nomina",
+          "slug": "nomina"
         }
       ]
     },

@@ -52,6 +52,7 @@
                         <table class="responsive-table">
                             <thead>
                                 <tr>
+                                    <th class="center" data-field="id">Empresa</th>
                                     <th class="center" data-field="id">Cedula </th>
                                     <th class="center" data-field="name">Nombre y Apellido</th>
                                     @foreach($evaluaciones as $pregunta)
@@ -64,6 +65,11 @@
                             <tbody>
                                 @foreach($oso as $p_oso)
                                 <tr>
+                                    <td class="center">
+                                        <?PHP echo ucwords($p_oso->empresa);?> <br>
+                                        {{$p_oso->descr}} <br>
+                                        {{$p_oso->ubicacion}}
+                                    </td>
                                     <td class="center">{{$p_oso->CEDULA}}</td>
                                     <td style="font-size: 11px;">{{$p_oso->NOMBRE }}</td>                                            
                                     <td>

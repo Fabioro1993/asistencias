@@ -42,13 +42,17 @@ class RegistroCab extends Model
 
     public function scopeTrabajador($query)
     {
-        $emp_agrense = DB::connection('agrense')->table('nmtrabajador')
+        //agren_trabajador
+        //$emp_agrense = DB::connection('agrense')->table('nmtrabajador')
+
+        $emp_agrense = DB::connection('mysql')->table('agren_trabajador as nmtrabajador')
                 ->selectRaw('"agrense" as empresa, nmtrabajador.CODIGO as CEDULA, CONCAT(nmtrabajador.NOMBRE, " ", nmtrabajador.APELLIDO) As NOMBRE, nmtrabajador.COD_DPTO as depto, nmtrabajador.UBICACION as ubicacion, nmdpto.DEP_DESCRI as descr')
                 ->join('nmdpto', 'nmtrabajador.COD_DPTO', '=', 'nmdpto.DEP_CODIGO')
                 ->where('nmtrabajador.CONDICION', '=', 'A')
                 ->whereNotNull('nmtrabajador.UBICACION')->get();
         
-        $emp_oso = DB::connection('oso')->table('nmtrabajador')
+       // $emp_oso = DB::connection('oso')->table('nmtrabajador')
+        $emp_oso = DB::connection('mysql')->table('oso_trabajador as nmtrabajador')
                 ->selectRaw('"oso" as empresa, nmtrabajador.CODIGO as CEDULA, CONCAT(nmtrabajador.NOMBRE, " ", nmtrabajador.APELLIDO) As NOMBRE, nmtrabajador.COD_DPTO as depto, nmtrabajador.UBICACION as ubicacion, nmdpto.DEP_DESCRI as descr')
                 ->join('nmdpto', 'nmtrabajador.COD_DPTO', '=', 'nmdpto.DEP_CODIGO')
                 ->where('nmtrabajador.CONDICION','=' ,'A')
@@ -158,7 +162,7 @@ class RegistroCab extends Model
         return $query;
     }
     
-    public function scopeResumenEdit($query, $id_reg)
+    public function scopeResumenEdit($query, $id_reg, $gerencia, $ubicacion)
     {
         $registro_cab = RegistroCab::with('registro_det')->find($id_reg);
 
@@ -266,12 +270,11 @@ class RegistroCab extends Model
             $resultado = $resumen_gd_sabado[$key] + ($resumen_gd_domingo[$key]*2);
             $resumen_gd_totales[$key]   = ($resultado == 0) ? null : $resultado;
         }
-
-
-        $nmtrabajador    = Nmtrabajdor::select(DB::raw('CONCAT(NOMBRE, " ", APELLIDO) AS nombre, CEDULA AS cedula'))->get();
+        
+        $nmtrabajador = RegistroCab::trabajador()->whereIn('depto', $gerencia)->whereIn('ubicacion', $ubicacion);
         
         foreach ($nmtrabajador as $key => $value) {
-            $cedulas_nmtrab[] = $value->cedula;
+            $cedulas_nmtrab[] = $value->CEDULA;
         }
         
         $resultado = array_diff($cedulas_nmtrab, $cedula_reg);

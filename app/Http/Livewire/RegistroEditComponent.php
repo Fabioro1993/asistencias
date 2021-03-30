@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire;
 
+use App\Models\Nmdpto;
 use Livewire\Component;
 use App\Models\Evaluacion;
 use App\Models\RegistroCab;
@@ -16,6 +17,7 @@ class RegistroEditComponent extends Component
     public $data, $observacion, $select_val, $id_reg, $cedula_reg, $eval_reg, $asistencia, $resumen_edit, $fin_semana, $adicionales, $input_sel;
     public $hidden = 'hidden';
     public $recargar = null;
+    public $dept; 
 
     public $comentario = array();
     public $evaluacion = array();
@@ -61,6 +63,11 @@ class RegistroEditComponent extends Component
         //Pageheader set true for breadcrumbs
         $pageConfigs = ['pageHeader' => true];
 
+        $dptos = Nmdpto::all();
+        foreach ($dptos as $key => $value) {
+            $this->dept[$value->DEP_CODIGO] =  $value->DEP_DESCRI;
+        }
+
         $this->observacion  = $this->data->observacion;
         $evaluaciones       = Evaluacion::whereIn('id_evaluacion', [1, 2, 3,4])->get();
         $select             = Evaluacion::whereIn('id_evaluacion', [5,6,7,8])->get();
@@ -73,9 +80,8 @@ class RegistroEditComponent extends Component
         }
 
         $oso = $this->data->registro_det;
-
-        foreach (Auth::user()->permiso as $key => $value) {
-            
+        $user = User::with('permiso')->find(Auth::user()->id);
+        foreach ($user->permiso as $key => $value) {            
             $gerencia[] = $value->gerencia;
             $ubicacion[] = $value->ubicacion;
         }  
@@ -104,7 +110,6 @@ class RegistroEditComponent extends Component
                 $this->comentario[$value->cedula]    = $value->comentario;
                 $this->adicionales_input[$value->cedula] = null;
                 
-
                 foreach ($value->registro_sub as $key_sub => $val_sub) {
                     $this->evaluacion[$value->cedula][$val_sub->id_evaluacion] = ($val_sub->resultado != 0) ? $val_sub->resultado : null;
                     if ($val_sub->id_evaluacion == 1) {
@@ -143,8 +148,7 @@ class RegistroEditComponent extends Component
                         $this->evaluacion[$val_resl][$evaluacion->id_evaluacion] = null;
                     }
                     
-                    foreach ($this->eval_reg as $key => $value) {
-                        
+                    foreach ($this->eval_reg as $key => $value) {                       
                         $this->select_val[$val_resl] = '0_'.$val_resl;
                         $this->input_sel[$val_resl]  = null;
                     }
@@ -155,7 +159,11 @@ class RegistroEditComponent extends Component
                     $this->cant_trabaj[$key] = $value;
                 }
             }
-            $this->resumen_edit = RegistroCab::resumenEdit($this->id_reg);
+            $this->resumen_edit = RegistroCab::resumenEdit($this->id_reg, $gerencia, $ubicacion);
+        }
+
+        foreach ($oso as $key => $value) {
+            $value['descr'] = $this->dept[$value->gerencia];
         }
 
         return view('livewire.registro.registro-edit-component', compact('evaluaciones', 'select', 'oso'))
@@ -325,9 +333,11 @@ class RegistroEditComponent extends Component
                 $registro_det->cedula        = $cedula;
                 $registro_det->nombre        = $value;
                 $registro_det->comentario    = $this->comentario[$cedula];
+                $registro_det->empresa       = $this->empr_trabaj[$cedula][0];
+                $registro_det->gerencia      = $this->empr_trabaj[$cedula][1];
+                $registro_det->ubicacion     = $this->empr_trabaj[$cedula][2];
                 $registro_det->save();
                 
-               
                 foreach ($evaluacion[$cedula] as $id_eval => $resul) {
 
                     $sub = RegistroSubdet::where('id_registro',$this->id_reg)->where('id_reg_det',$registro_det->id_reg_det)
@@ -353,11 +363,6 @@ class RegistroEditComponent extends Component
             DB::rollback();
             throw $th;
         }
-        
-        // $this->validate([
-        //     'estado' => 'required|unique:estados'
-        // ]);
-        // $this->reset(['estado']);
     }
 
 }

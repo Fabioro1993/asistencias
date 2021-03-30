@@ -5,11 +5,11 @@ namespace App\Http\Livewire;
 use Livewire\Component;
 use App\Models\RegistroCab;
 use App\Models\Evaluacion;
-
+use App\Models\Nmdpto;
 
 class RegistroShowComponent extends Component
 {
-    public $data, $data_det;
+    public $data, $data_det, $dept;
     public $array = 'show';
 
     public function mount($id)
@@ -30,7 +30,16 @@ class RegistroShowComponent extends Component
         //Pageheader set true for breadcrumbs
         $pageConfigs = ['pageHeader' => true];
 
+        $dptos = Nmdpto::all();
+        foreach ($dptos as $key => $value) {
+            $this->dept[$value->DEP_CODIGO] =  $value->DEP_DESCRI;
+        }
+
         $data = $this->data;
+        foreach ($data->registro_det as $key => $det) {
+            $det['text_geren'] = $this->dept[$det->gerencia];
+        }
+
         $evaluaciones = Evaluacion::whereIn('id_evaluacion', [1, 2, 3,4])->get();
         
         return view('livewire.registro.registro-show-component', compact('data', 'evaluaciones'))

@@ -47,6 +47,7 @@
                         <table class="striped responsive-table">
                             <thead>
                                 <tr>
+                                    <th>Empresa</th>
                                     <th>Cedula</th>
                                     <th>Nombre</th>
                                     @foreach($evaluaciones as $pregunta)
@@ -58,12 +59,17 @@
                             <tbody>
                                 @foreach($data->registro_det as $registro_dt)
                                 <tr>
+                                    <td class="center">
+                                        <?PHP echo ucwords($registro_dt->empresa);?> <br>
+                                        {{$registro_dt->text_geren}} <br>
+                                        {{$registro_dt->ubicacion}}
+                                    </td>
                                     <td class="users-view-username">{{$registro_dt->cedula}}</td>
                                     <td class="users-view-name">{{$registro_dt->nombre}}</td>
                                     @foreach($registro_dt->registro_sub as $sub)
                                     <th class="center">
-                                        
-                                        {{($sub->resultado == 0) ? ' ' : $sub->resultado}}</th>
+                                        {{($sub->resultado == 0) ? ' ' : $sub->resultado}}
+                                    </th>
                                     @endforeach
                                     <td class="users-view-email">{{$registro_dt->comentario}}</td>
                                 </tr>

@@ -23,6 +23,7 @@ class UserComponent extends Component
 
     public function render()
     {
+       // dd('a');
         $data = User::with('estado', 'rol')->get();
         $roles = Rol::all();
         $estados = Estado::whereIn('id_estado', [1, 2])->get();

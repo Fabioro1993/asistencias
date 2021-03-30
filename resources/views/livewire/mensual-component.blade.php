@@ -14,7 +14,6 @@
                                 <tr>
                                     <th data-field="name">Fecha</th>
                                     <th data-field="price">Responsable</th>
-                                    <th data-field="total">Gerencia</th>
                                     <th data-field="total">Comentario</th>
                                     <th data-field="status">Accion</th>
                                 </tr>
@@ -26,7 +25,6 @@
                                         <?PHP echo date('d-m-Y',strtotime($registro->fecha));?>
                                     </td>
                                     <td>{{$registro->responsable->name}}</td>
-                                    <td>{{$registro->gerencia}}</td>
                                     <td>{{$registro->observacion}}</td>
                                     <td>
                                         @if ($registro->id_estado == 3)

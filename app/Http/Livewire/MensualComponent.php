@@ -2,8 +2,12 @@
 
 namespace App\Http\Livewire;
 
+use App\Models\User;
+
 use Livewire\Component;
 use App\Models\RegistroCab;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class MensualComponent extends Component
 {
@@ -41,9 +45,25 @@ class MensualComponent extends Component
         //Pageheader set true for breadcrumbs
         $pageConfigs = ['pageHeader' => true];
         
-        $data = RegistroCab::where('empresa', session('empresa'))
-                            ->whereMonth('fecha', $this->mes)
-                            ->whereYear('fecha', $this->anio)->get();
+        $user = User::with('permiso')->find(Auth::user()->id);
+        
+        foreach ($user->permiso as $key => $value) { 
+            $gerencia[] = $value->gerencia;
+            $ubicacion[] = $value->ubicacion;
+        }  
+        
+        //$nmtrabajador = RegistroCab::trabajador()->whereIn('depto', $gerencia)->whereIn('ubicacion', $ubicacion);
+
+        $data = RegistroCab::with(["registro_det" => function($a)  use ($gerencia, $ubicacion){
+            $a->whereIn('gerencia', $gerencia)->whereIn('ubicacion', $ubicacion);;
+        }])
+        ->whereMonth('fecha', $this->mes)
+        ->whereYear('fecha', $this->anio)->get();
+        //dd($data);
+        
+        
+        // $data = RegistroCab::whereMonth('fecha', $this->mes)
+        //                     ->whereYear('fecha', $this->anio)->get();
 
         return view('livewire.mensual-component', compact('data'))->layout('layouts.contentLayoutMaster', compact('pageConfigs', 'breadcrumbs'));
     }

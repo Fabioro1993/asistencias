@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Auth;
 use Laravel\Fortify\Fortify;
 use App\Models\User;
 
+use Illuminate\Support\Facades\Hash;
+
+
 class AuthServiceProvider extends ServiceProvider
 {
     /**
@@ -30,21 +33,32 @@ class AuthServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->registerPolicies();
+
+
         Fortify::authenticateUsing(function ($request) {
+            $user = User::where('username', $request->username)->first();
+            
+            if ($user) {
+                return $user;
+            }
+        });
+
+        //LDAP
+        /*Fortify::authenticateUsing(function ($request) {
 
             $usuario = User::where('username', $request->username)->first();
-
+            
             if ($usuario == null) {
                 $validated = false;
             } else {
                 
                 $validated = Auth::validate([
                     'samaccountname' => $request->username,
-                    'password' => $request->password
+                    'password' => $request->password,
                 ]);
             }
             
             return $validated ? Auth::getLastAttempted() : null;
-        });
+        });*/
     }
 }

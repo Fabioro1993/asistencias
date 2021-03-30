@@ -27,11 +27,11 @@ class RegistroResumenEditComponent extends Component
     {
         $this->id_registro = $id_registro;
         $this->arry = $array;
-        //dd($this->arry);
     }
     
     public function render()
     {
+        
         $registro_cab = RegistroCab::with('registro_det')->find($this->id_registro);
 
         $fecha_max = RegistroCab::fechaMax($registro_cab->fecha);
