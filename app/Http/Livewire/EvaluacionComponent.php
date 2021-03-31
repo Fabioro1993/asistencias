@@ -15,7 +15,7 @@ class EvaluacionComponent extends Component
     public function render()
     {
         $data = Evaluacion::orderBy('id_evaluacion', 'desc')->get();
-        return view('livewire.evaluacion-component', compact('data')); 
+        return view('livewire.administracion.evaluacion-component', compact('data')); 
     }
 
     public function updatedFormato()

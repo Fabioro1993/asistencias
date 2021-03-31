@@ -50,21 +50,16 @@ class MensualComponent extends Component
         foreach ($user->permiso as $key => $value) { 
             $gerencia[] = $value->gerencia;
             $ubicacion[] = $value->ubicacion;
-        }  
+        }
         
-        //$nmtrabajador = RegistroCab::trabajador()->whereIn('depto', $gerencia)->whereIn('ubicacion', $ubicacion);
-
-        $data = RegistroCab::with(["registro_det" => function($a)  use ($gerencia, $ubicacion){
-            $a->whereIn('gerencia', $gerencia)->whereIn('ubicacion', $ubicacion);;
-        }])
-        ->whereMonth('fecha', $this->mes)
-        ->whereYear('fecha', $this->anio)->get();
-        //dd($data);
-        
-        
-        // $data = RegistroCab::whereMonth('fecha', $this->mes)
-        //                     ->whereYear('fecha', $this->anio)->get();
-
-        return view('livewire.mensual-component', compact('data'))->layout('layouts.contentLayoutMaster', compact('pageConfigs', 'breadcrumbs'));
+        $data = RegistroCab::select(DB::raw('MONTH(fecha) mes, IF( DAY(fecha)<=15,"I","II") AS quincena'),'fecha', 'id_registro', 'id', 'observacion')
+                            ->with(["registro_det" => function($a)  use ($gerencia, $ubicacion){
+                                $a->whereIn('gerencia', $gerencia)->whereIn('ubicacion', $ubicacion);;
+                            }])
+                            ->whereMonth('fecha', $this->mes)
+                            ->whereYear('fecha', $this->anio)->get();
+                            
+        return view('livewire.mensual-component', compact('data'))
+                ->layout('layouts.contentLayoutMaster', compact('pageConfigs', 'breadcrumbs'));
     }
 }

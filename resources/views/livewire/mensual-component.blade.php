@@ -1,4 +1,17 @@
 @section('title','Historico')
+{{-- vendor styles --}}
+@section('vendor-style')
+    <link rel="stylesheet" type="text/css" href="{{asset('vendors/flag-icon/css/flag-icon.min.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{asset('vendors/data-tables/css/jquery.dataTables.min.css')}}">
+    <link rel="stylesheet" type="text/css"
+    href="{{asset('vendors/data-tables/extensions/responsive/css/responsive.dataTables.min.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{asset('vendors/data-tables/css/select.dataTables.min.css')}}">
+@endsection
+
+{{-- page style --}}
+@section('page-style')
+    <link rel="stylesheet" type="text/css" href="{{asset('css/pages/data-tables.css')}}">
+@endsection
 <div class="row">
     <div class="col s12 m12 l12">
         <div id="responsive-table" class="card card card-default scrollspy">
@@ -9,10 +22,11 @@
                     <div class="col s12">
                     </div>
                     <div class="col s12">
-                        <table class="responsive-table">
+                        <table id="data-table-row-grouping" class="display responsive-table">
                             <thead>
                                 <tr>
                                     <th data-field="name">Fecha</th>
+                                    <th data-field="price">Quincena</th>
                                     <th data-field="price">Responsable</th>
                                     <th data-field="total">Comentario</th>
                                     <th data-field="status">Accion</th>
@@ -24,6 +38,7 @@
                                     <td>
                                         <?PHP echo date('d-m-Y',strtotime($registro->fecha));?>
                                     </td>
+                                    <td>Quincena - {{$registro->quincena}}</td>
                                     <td>{{$registro->responsable->name}}</td>
                                     <td>{{$registro->observacion}}</td>
                                     <td>
@@ -49,3 +64,17 @@
     </div>
     @include('pages.sidebar.fab-menu')
 </div>
+
+@push('script')
+    {{-- vendor scripts --}}
+    @section('vendor-script')
+        <script src="{{asset('vendors/data-tables/js/jquery.dataTables.min.js')}}"></script>
+        <script src="{{asset('vendors/data-tables/extensions/responsive/js/dataTables.responsive.min.js')}}"></script>
+        <script src="{{asset('vendors/data-tables/js/dataTables.select.min.js')}}"></script>
+    @endsection
+
+    {{-- page script --}}
+    @section('page-script')
+        <script src="{{asset('js/scripts/data-tables.js')}}"></script>
+    @endsection
+@endpush

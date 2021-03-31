@@ -313,4 +313,135 @@ class RegistroCab extends Model
        
         return $data;
     }
+
+    public function scopeResumenNomina($query, $id_reg, $gerencia, $ubicacion)
+    {
+        $registro_cab = RegistroCab::with('registro_det')->find($id_reg);
+        
+        $fecha_max = RegistroCab::fechaMax($registro_cab->fecha);
+
+        $mes = date("m", strtotime($registro_cab->fecha));
+
+        $fin_sem = RegistroCab::finSemana($registro_cab->fecha);
+        
+        foreach ($registro_cab->registro_det as $key => $det) {
+            
+            $trab_empresa[$det->cedula]   = $det->empresa;
+
+            $trabajador[$det->gerencia][$det->cedula]   = $det->nombre;
+            
+            $resumen_gd_totales[$det->gerencia][$det->cedula]   = null;
+        
+            $hist_regi = DB::table('registros_subdet')
+                    ->select(
+                        DB::raw('SUM(resultado) as asistencia,
+                        COUNT(IF(resultado = "F", 1, NULL)) "falta",
+                        COUNT(IF(resultado = "V", 1, NULL)) "vacacion",
+                        COUNT(IF(resultado = "R", 1, NULL)) "reposo",
+                        COUNT(IF(resultado = "P", 1, NULL)) "permiso"'),
+                        'id_evaluacion', 'registros_det.cedula')
+                    ->join('registros_det', 'registros_subdet.id_reg_det', '=', 'registros_det.id_reg_det')
+                    ->join('registros_cab', 'registros_det.id_registro', '=', 'registros_cab.id_registro')
+                    ->whereMonth('fecha', $mes)
+                    ->where('cedula', $det->cedula)
+                    ->groupBy('id_evaluacion', 'cedula')
+                    ->get();
+
+            if (count($hist_regi) > 0) {
+                foreach ($hist_regi as $key => $value) {
+                    
+                    if ($value->id_evaluacion == 1) {
+                        $resumen_asistencia[$det->gerencia][$value->cedula]   = ($value->asistencia != 0) ? $value->asistencia : null;
+                        $resumen_faltajust[$det->gerencia][$value->cedula]    = ($value->falta != 0) ? $value->falta : null;
+                        $resumen_vacacion[$det->gerencia][$value->cedula]     = ($value->vacacion != 0) ? $value->vacacion : null;
+                        $resumen_reposo[$det->gerencia][$value->cedula]       = ($value->reposo != 0) ? $value->reposo : null;
+                        $resumen_permiso[$det->gerencia][$value->cedula]      = ($value->permiso != 0) ? $value->permiso : null;
+                    }
+                    if ($value->id_evaluacion == 2) {
+                        $resumen_hx_diurna[$det->gerencia][$value->cedula]    = ($value->asistencia != 0) ? $value->asistencia : null;
+                    }
+                    if ($value->id_evaluacion == 3) {
+                        $resumen_hx_nocturna[$det->gerencia][$value->cedula]  = ($value->asistencia != 0) ? $value->asistencia : null;
+                    }
+                    if ($value->id_evaluacion == 4) {
+                        $bono_nocturno[$det->gerencia][$value->cedula]        = ($value->asistencia != 0) ? $value->asistencia : null;
+                    }
+                }
+            }else{
+                $resumen_asistencia[$det->gerencia][$value->cedula]   = null; 
+                $resumen_hx_diurna[$det->gerencia][$value->cedula]    = null; 
+                $resumen_hx_nocturna[$det->gerencia][$value->cedula]  = null; 
+                $bono_nocturno[$det->gerencia][$value->cedula]        = null;
+                $resumen_faltajust[$det->gerencia][$value->cedula]    = null;
+                $resumen_vacacion[$det->gerencia][$value->cedula]     = null;
+                $resumen_reposo[$det->gerencia][$value->cedula]       = null;
+                $resumen_permiso[$det->gerencia][$value->cedula]      = null;
+                $adicionales[$det->gerencia][$value->cedula]          = null;
+            }
+
+            $hist_gd_adicional = RegistroCab::guardiaAdional($value->cedula, $mes);
+            
+            if (count($hist_gd_adicional) > 0) {
+                foreach ($hist_gd_adicional as $key => $val_adic) {
+                    if ($val_adic->id_evaluacion == 11) {
+                        $adicionales[$det->gerencia][$det->cedula]  = ($val_adic->asistencia != 0) ? $val_adic->asistencia : null;
+                    }
+                }
+            }else{
+                $adicionales[$det->gerencia][$det->cedula]   = null;
+            }
+
+            $sabado = $fin_sem['sabado'];
+            $hist_regi_sabd = RegistroCab::resumenFinSemana($det->cedula, $sabado, $mes);
+
+            if (count($hist_regi_sabd) > 0) {
+                foreach ($hist_regi_sabd as $key => $val_sab) {
+                    if ($val_sab->id_evaluacion == 1) {
+                        $resumen_gd_sabado[$det->gerencia][$val_sab->cedula]   = ($val_sab->asistencia != 0) ? $val_sab->asistencia : null;
+                    }
+                }
+            }else{
+                $resumen_gd_sabado[$det->gerencia][$det->cedula]   = null;
+            }
+
+            $domingo = $fin_sem['domingo'];
+            $hist_regi_domg = RegistroCab::resumenFinSemana($det->cedula, $domingo,$mes);
+
+            if (count($hist_regi_domg) > 0) {
+                foreach ($hist_regi_domg as $key => $val_domg) {
+                    if ($val_domg->id_evaluacion == 1) {
+                        $resumen_gd_domingo[$det->gerencia][$val_domg->cedula]   = ($val_domg->asistencia != 0) ? $val_domg->asistencia : null;
+                    }
+                }
+            }else{
+                $resumen_gd_domingo[$det->gerencia][$det->cedula]   = null;
+            }
+        }
+
+        //CALCULO DE GUARDIAS TOTALES
+        foreach ($resumen_gd_totales as $key => $gd_total) {
+            foreach ($gd_total as $cedula => $val_gd) {
+                $resultado = $resumen_gd_sabado[$key][$cedula] + ($resumen_gd_domingo[$key][$cedula]*2);
+                $resumen_gd_totales[$key][$cedula]   = ($resultado == 0) ? null : $resultado;
+            }
+        }
+        
+        $data['resumen_gd_totales'] = $resumen_gd_totales;
+        $data['resumen_asistencia'] = $resumen_asistencia;
+        $data['resumen_faltajust'] = $resumen_faltajust;
+        $data['resumen_vacacion'] = $resumen_vacacion;
+        $data['resumen_hx_diurna'] = $resumen_hx_diurna;
+        $data['resumen_hx_nocturna'] = $resumen_hx_nocturna;
+        $data['bono_nocturno'] = $bono_nocturno;
+        $data['adicionales'] = $adicionales;                
+        $data['resumen_gd_sabado'] = $resumen_gd_sabado;               
+        $data['resumen_gd_domingo'] = $resumen_gd_domingo;
+        $data['resumen_reposo'] = $resumen_reposo;
+        $data['resumen_permiso'] = $resumen_permiso;
+        $data['fecha_max'] = $fecha_max;
+        $data['trabajador'] = $trabajador;
+        $data['trab_empresa'] = $trab_empresa;
+        
+        return $data;
+    }
 }

@@ -13,7 +13,9 @@ use App\Http\Livewire\InicioComponent;
 
 use App\Http\Livewire\MensualComponent;
 
-use App\Http\Livewire\CargarNominaComponent;
+use App\Http\Livewire\NominaComponent;
+use App\Http\Livewire\NominaResumenComponent;
+
 
 
 /*
@@ -35,7 +37,12 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/historico/edit/{id}', Reg
 Route::middleware(['auth:sanctum', 'verified'])->get('/registro', RegistroComponent::class)->name('/registro');
 Route::middleware(['auth:sanctum', 'verified'])->get('/administracion', Administracion::class)->name('administracion');
 
-Route::middleware(['auth:sanctum', 'verified'])->get('/nomina', CargarNominaComponent::class)->name('nomina');
+Route::middleware(['auth:sanctum', 'verified'])->get('/nomina', NominaComponent::class)->name('nomina');
+
+Route::middleware(['auth:sanctum', 'verified'])->get('/nomina/resumen/{quincena}/{mes}/{anio}', NominaResumenComponent::class)->name('nomina/resumen/{quincena}/{mes}/{anio}');
+
+
+Route::middleware(['auth:sanctum', 'verified'])->get('/nomina/resumen/pdf/{id}', [NominaResumenComponent::class, 'pdf']);
 
 // Page Route
 //Route::get('/', 'PageController@blankPage');

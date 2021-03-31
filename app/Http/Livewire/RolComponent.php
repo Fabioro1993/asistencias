@@ -13,7 +13,7 @@ class RolComponent extends Component
     public function render()
     {
         $data = Rol::orderBy('id_rol', 'desc')->get();
-        return view('livewire.rol-component', compact('data'));
+        return view('livewire.administracion.rol-component', compact('data'));
     }
 
     public function store()

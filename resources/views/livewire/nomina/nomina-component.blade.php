@@ -1,4 +1,4 @@
-@section('title','Historico')
+@section('title','Nomina')
 {{-- vendor styles --}}
 @section('vendor-style')
     <link rel="stylesheet" type="text/css" href="{{asset('vendors/flag-icon/css/flag-icon.min.css')}}">
@@ -30,12 +30,13 @@
                     @foreach($data as $registro)
                     <tr>
                         <td class="center">
-                            {{$registro->text_mes}}
+                            {{$registro->text_mes}} - {{$registro->quincena}}
                         </td>
                         <td class="center">{{$registro->anio}}</td>
                         <td class="center">
-                            <a class="waves-effect waves-light gradient-45deg-light-blue-cyan btn-small mb-1 mr-1"
-                            wire:click="$emit('modal',{{$registro->mes}}, {{$registro->anio}})">Detalle</a>
+                            <a href="nomina/resumen/{{$registro->quincena}}/{{$registro->mes}}/{{$registro->anio}}"
+                            class="waves-effect waves-light gradient-45deg-light-blue-cyan btn-small mb-1 mr-1"
+                            >Detalle</a>
                         </td>
                     </tr>
                     @endforeach
@@ -46,7 +47,6 @@
         </div>
       </div>
     </div>
-    @include('pages.sidebar.fab-menu')
 </div>
 @push('script')
     {{-- vendor scripts --}}
@@ -60,12 +60,4 @@
     @section('page-script')
         <script src="{{asset('js/scripts/data-tables.js')}}"></script>
     @endsection
-
-    <script>
-      document.addEventListener('livewire:load', function () {
-        @this.on('modal', (mes, anio) => {
-          @this.call('modal', mes, anio)
-        })
-      })  
-    </script>
 @endpush

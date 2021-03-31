@@ -13,7 +13,7 @@ class EstadoComponent extends Component
     public function render()
     {
         $data = Estado::orderBy('id_estado', 'desc')->get();
-        return view('livewire.estado-component', compact('data'));
+        return view('livewire.administracion.estado-component', compact('data'));
     }
 
     public function store()

@@ -53,7 +53,7 @@ return [
     |
     */
 
-    'asset_url' => 'http://localhost:8000',
+    'asset_url' => 'http://localhost/asistencia',
 
     /*
     |--------------------------------------------------------------------------

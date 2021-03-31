@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire;
 
+use App\Models\User;
 use App\Models\Nmdpto;
 use Livewire\Component;
 use App\Models\Evaluacion;

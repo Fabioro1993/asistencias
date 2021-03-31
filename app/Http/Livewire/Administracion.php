@@ -14,6 +14,6 @@ class Administracion extends Component
         //Pageheader set true for breadcrumbs
         $pageConfigs = ['pageHeader' => true];
 
-        return view('livewire.administracion')->layout('layouts.contentLayoutMaster', compact('pageConfigs', 'breadcrumbs'));
+        return view('livewire.administracion.administracion')->layout('layouts.contentLayoutMaster', compact('pageConfigs', 'breadcrumbs'));
     }
 }

@@ -10,7 +10,7 @@ class UserBase extends Component
 
     public function render()
     {
-        return view('livewire.user-base');
+        return view('livewire.administracion.users.user-base');
     }
 
     public function PestActiv()

@@ -32,7 +32,7 @@ class UserComponent extends Component
 
         $dptos = Nmdpto::all();
         
-        return view('livewire.user-component', compact('data', 'roles', 'estados', 'ubicacion', 'dptos'));
+        return view('livewire.administracion.users.user-component', compact('data', 'roles', 'estados', 'ubicacion', 'dptos'));
     }
     
     //Enviar ID de usuario a Component UserRegistro newPost

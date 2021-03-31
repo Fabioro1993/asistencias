@@ -7,7 +7,7 @@ use Livewire\Component;
 use App\Models\RegistroCab;
 use Illuminate\Support\Facades\DB;
 
-class CargarNominaComponent extends Component
+class NominaComponent extends Component
 {
     private $meses = array(
 		1  => 'Enero',
@@ -27,20 +27,20 @@ class CargarNominaComponent extends Component
     public function render()
     {
         $breadcrumbs = [
-            ['link'=>"/",'name'=>"Inicio"],['link'=>"/administracion",'name'=>"Administración"],
+            ['link'=>"/",'name'=>"Inicio"],['link'=>"/nomina",'name'=>"Nomina"],
         ];
         //Pageheader set true for breadcrumbs
         $pageConfigs = ['pageHeader' => true];
-
-        $data = RegistroCab::select(DB::raw('MONTH(fecha) mes'), DB::raw('YEAR(fecha) anio'))
-                            //->where('empresa', session('empresa'))
-                            ->groupby('mes', 'anio')->get();
+        
+        $data = RegistroCab::select(DB::raw('MONTH(fecha) mes, IF( DAY(fecha)<=15,"I","II") AS quincena'),
+                             DB::raw('YEAR(fecha) anio'))
+                            ->groupby('quincena','mes', 'anio')->get();
 
         foreach ($data as $key => $value) {
             $value['text_mes'] = $this->meses[$value->mes];
         }
 
-        return view('livewire.nomina.cargar-nomina-component', compact('data'))
+        return view('livewire.nomina.nomina-component', compact('data'))
             ->layout('layouts.contentLayoutMaster', compact('pageConfigs', 'breadcrumbs'));
     }
 }

@@ -36,7 +36,7 @@ class UserRegistroComponent extends Component
             $this->permiso = null;
         }
         
-        return view('livewire.user-registro-component', compact('data', 'roles', 'estados', 'ubicacion', 'dptos'));
+        return view('livewire.administracion.users.user-registro-component', compact('data', 'roles', 'estados', 'ubicacion', 'dptos'));
     }
 
     public function buscar()
