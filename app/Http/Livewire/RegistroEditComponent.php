@@ -81,12 +81,11 @@ class RegistroEditComponent extends Component
 
         $oso = $this->data->registro_det;
         $user = User::with('permiso')->find(Auth::user()->id);
-        foreach ($user->permiso as $key => $value) {            
-            $gerencia[] = $value->gerencia;
-            $ubicacion[] = $value->ubicacion;
-        }  
+        foreach ($user->permiso as $key => $value) {
+            $ubi[] = $value->empresa.'_'.$value->gerencia.'_'.$value->ubicacion;
+        }
         
-        $nmtrabajador = RegistroCab::trabajador()->whereIn('depto', $gerencia)->whereIn('ubicacion', $ubicacion);
+        $nmtrabajador = RegistroCab::trabajador()->whereIn('emp_dep', $ubi);
 
         foreach ($nmtrabajador as $key => $value) {
             $cedulas_nmtrab[] = $value->CEDULA;

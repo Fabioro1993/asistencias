@@ -3,12 +3,16 @@
     @foreach ($menu as $submenu)
     @php
       $custom_classes="";
+      $acceso = "hidden";
       if(isset($submenu->class))
       {
       $custom_classes = $submenu->class;
       }
+      if (in_array(Auth::user()->rol->id_rol, $submenu->acceso)) {
+              $acceso = '';
+       }
       @endphp
-    <li class="{{(request()->is($submenu->url.'*')) ? 'active' : '' }}">
+    <li class="{{(request()->is($submenu->url.'*')) ? 'active' : '' }}" {{$acceso}}>
       <a href="@if(($submenu->url) === 'javascript:void(0)'){{$submenu->url}} @else{{url($submenu->url)}} @endif"
         class="{{$custom_classes}} {{(request()->is($submenu->url.'*')) ? 'active '.$configData['activeMenuColor'] : '' }}"
         @if(!empty($configData['activeMenuColor'])) {{'style=background:none;box-shadow:none;'}} @endif

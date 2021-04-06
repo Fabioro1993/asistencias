@@ -23,16 +23,8 @@ class UserComponent extends Component
 
     public function render()
     {
-       // dd('a');
         $data = User::with('estado', 'rol')->get();
-        $roles = Rol::all();
-        $estados = Estado::whereIn('id_estado', [1, 2])->get();
-
-        $ubicacion = Nmtrabajdor::select('UBICACION')->where('UBICACION', '!=', null)->groupby('UBICACION')->get();
-
-        $dptos = Nmdpto::all();
-        
-        return view('livewire.administracion.users.user-component', compact('data', 'roles', 'estados', 'ubicacion', 'dptos'));
+        return view('livewire.administracion.users.user-component', compact('data'));
     }
     
     //Enviar ID de usuario a Component UserRegistro newPost
@@ -53,43 +45,4 @@ class UserComponent extends Component
         //actualizar componente de lista de usuarios (este)
         $this->emit('PestActiv');
     }
-
-     // public function buscar()
-    // {
-    //     $this->reset(['new_name', 'new_email', 'accion']);
-    //     $users = ldapUS::where('samaccountname', $this->username)->first();
-
-    //     $this->validate([
-    //         'username' => ['required', new NoNull($users)]
-    //     ]);
-        
-    //     $this->new_name         = $users->displayname[0];
-    //     $this->new_email        = str_replace(".net", ".com", $users->userprincipalname[0]); 
-    //     $this->accion    = 'store'; 
-    // }
-
-    // public function store()
-    // {
-    //     $userldap = ldapUS::where('samaccountname', $this->username)->first();
-
-    //     $this->validate([
-    //         'username' => ['required', new NoNull($userldap), 'unique:users'],
-    //         'estado' => 'required',
-    //         'rol' => 'required',            
-    //     ]);
-        
-    //     $users              = new User();        
-    //     $users->name        = $this->new_name;
-    //     $users->username    = strtolower($this->username);
-    //     $users->email       = $this->new_email;
-    //     $users->id_estado   = $this->estado;
-    //     $users->id_rol      = $this->rol;
-    //     $users->guid        = $userldap->getConvertedGuid('objectguid');
-    //     $users->domain      = 'default';
-    //     $users->save();
-
-    //     $this->accion = 'ver';
-    //     $this->reset(['estado', 'rol', 'new_email', 'username', 'new_name']); 
-    //     $this->dispatchBrowserEvent('contentChanged');
-    // }
 }

@@ -64,11 +64,12 @@
                     <tbody>
                         @foreach ($dptos as $dpto )
                         <tr>
-                            <td>{{$dpto->DEP_DESCRI}}</td>
+                            <td><?PHP echo ucwords($dpto->empresa);?> - <?PHP echo strtoupper($dpto->DEP_DESCRI);?> 
+                                 </td>
                             @foreach ($ubicacion as $item)
                             <td>
                                 <label>
-                                    <input type="checkbox" wire:model.defer="permiso.{{ $dpto->DEP_CODIGO }}.{{$item->UBICACION }}"/>
+                                    <input type="checkbox" wire:model.defer="permiso.{{ $dpto->empresa }}.{{ $dpto->DEP_CODIGO }}.{{$item->UBICACION }}"/>
                                     <span></span>
                                 </label>
                             </td>

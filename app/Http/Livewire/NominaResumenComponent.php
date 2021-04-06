@@ -15,6 +15,21 @@ class NominaResumenComponent extends Component
 {
     public $quincena, $mes, $anio, $id_reg, $dept;
 
+    private $meses = array(
+		1  => 'Enero',
+		2  => 'Febrero',
+		3  => 'Marzo',
+		4  => 'Abril',
+		5  => 'Mayo',
+		6  => 'Junio',
+		7  => 'Julio',
+		8  => 'Agosto',
+		9  => 'Septiembre',
+		10 => 'Octubre',
+		11 => 'Noviembre',
+		12 => 'Diciembre'
+    );
+
     public function mount($quincena, $mes, $anio)
     {
         $this->quincena = $quincena;
@@ -54,7 +69,7 @@ class NominaResumenComponent extends Component
         }
 
         $resumen = RegistroCab::resumenNomina($this->id_reg, $gerencia, $ubicacion);
-        //dd($resumen['resumen_gd_totales']);
+
         return view('livewire.nomina.nomina-resumen-component', compact('resumen'))
                 ->layout('layouts.contentLayoutMaster', compact('pageConfigs', 'breadcrumbs'));
     }
@@ -74,7 +89,13 @@ class NominaResumenComponent extends Component
             $dept[$value->DEP_CODIGO] =  $value->DEP_DESCRI;
         }
         
-        $pdf = PDF::loadView('livewire.nomina.nominapdf', compact('resumen', 'dept'));
-        return $pdf->download('invoice.pdf');
+        if (date("d", strtotime($resumen['fecha_max'])) <= '15') {
+            $quincena = $this->meses[date("n", strtotime($resumen['fecha_max']))].' I';
+        }else{
+            $quincena = $this->meses[date("n", strtotime($resumen['fecha_max']))].' II';
+        }
+        
+        $pdf = PDF::loadView('livewire.nomina.nominapdf', compact('resumen', 'dept', 'quincena'))->setPaper('a4', 'landscape');;
+        return $pdf->stream(''.$quincena.'.pdf');
     }
 }

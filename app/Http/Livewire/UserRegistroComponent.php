@@ -24,14 +24,12 @@ class UserRegistroComponent extends Component
 
     public function render()
     {
-        $data = User::with('estado', 'rol')->get();
-        $roles = Rol::all();
-        $estados = Estado::whereIn('id_estado', [1, 2])->get();
-
+        $roles     = Rol::all();
+        $dptos     = Nmdpto::dpto();
+        $data      = User::with('estado', 'rol')->get();
+        $estados   = Estado::whereIn('id_estado', [1, 2])->get();
         $ubicacion = Nmtrabajdor::select('UBICACION')->where('UBICACION', '!=', null)->groupby('UBICACION')->get();
-
-        $dptos = Nmdpto::all();
-
+        
         if ($this->accion == 'ver') {
             $this->permiso = null;
         }
@@ -77,15 +75,19 @@ class UserRegistroComponent extends Component
             $users->domain      = 'default';
             $users->save();
     
-            foreach ($this->permiso as $dpto => $ubic) {
+            foreach ($this->permiso as $empresa => $dptos) {
                 
-                foreach ($ubic as $key => $value) {
+                foreach ($dptos as $dept => $ubics) {
                     
-                    $permiso                = new Permisos();
-                    $permiso->id            = $users->id;
-                    $permiso->gerencia      = $dpto;
-                    $permiso->ubicacion     = $key;
-                    $permiso->save();
+                    foreach ($ubics as $ubic => $value) {
+                    
+                        $permiso                = new Permisos();
+                        $permiso->id            = $users->id;
+                        $permiso->empresa       = $empresa;
+                        $permiso->gerencia      = $dept;
+                        $permiso->ubicacion     = $ubic;
+                        $permiso->save();
+                    }
                 }
             }
     
@@ -115,26 +117,32 @@ class UserRegistroComponent extends Component
                 $users->id_estado = $this->estado_input;
             }
             
-            foreach ($this->permiso as $dpto => $val) {
+            foreach ($this->permiso as $empresa => $val) {
                 
-                foreach ($val as $ubic => $value) { 
+                foreach ($val as $dpto => $ubics) { 
 
-                    $permiso = Permisos::where('id', $this->id_usuario)
-                                    ->where('gerencia', $dpto)
-                                    ->where('ubicacion', $ubic)->first();
-
-                    if (isset($permiso)) {
-                        if ($value == false) {
-                            $permiso_delete = Permisos::find($permiso->id_permiso);
-                            $permiso_delete->delete();
+                    foreach ($ubics as $ubic => $value) {
+                        
+                        $permiso = Permisos::where('id', $this->id_usuario)
+                                        ->where('empresa', $empresa)
+                                        ->where('gerencia', $dpto)
+                                        ->where('ubicacion', $ubic)->first();
+                        
+                        if (isset($permiso)) {
+                            if ($value == false) {
+                                $permiso_delete = Permisos::find($permiso->id_permiso);
+                                $permiso_delete->delete();
+                            }
+                        } else {
+                            if ($value == true) {
+                                $permiso_new                = new Permisos();
+                                $permiso_new->id            = $users->id;
+                                $permiso_new->empresa       = $empresa;
+                                $permiso_new->gerencia      = $dpto;
+                                $permiso_new->ubicacion     = $ubic;
+                                $permiso_new->save();
+                            }
                         }
-                    } else {
-
-                        $permiso_new                = new Permisos();
-                        $permiso_new->id            = $users->id;
-                        $permiso_new->gerencia      = $dpto;
-                        $permiso_new->ubicacion     = $ubic;
-                        $permiso_new->save();
                     }
                 }
             }
@@ -156,8 +164,7 @@ class UserRegistroComponent extends Component
         $this->permiso = null;
         $permiso = Permisos::where('id', $usuario->id)->get();
         foreach ($permiso as $key => $value) {
-
-            $this->permiso[$value->gerencia][$value->ubicacion] = true;
+            $this->permiso[$value->empresa][$value->gerencia][$value->ubicacion] = true;
         }
         
         $this->id_usuario   = $usuario->id;

@@ -11,7 +11,7 @@ class Permisos extends Model
 
     protected $table = 'permisos';
 
-    protected $fillable=['id', 'gerencia', 'ubicacion'];
+    protected $fillable=['id', 'empresa', 'gerencia', 'ubicacion'];
 
     protected $primaryKey = 'id_permiso';
 }

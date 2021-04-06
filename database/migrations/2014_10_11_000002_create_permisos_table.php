@@ -16,6 +16,7 @@ class CreatePermisosTable extends Migration
         Schema::create('permisos', function (Blueprint $table) {
             $table->bigIncrements('id_permiso');
             $table->foreignId('id')->references('id')->on('users');
+            $table->string('empresa');
             $table->string('gerencia');
             $table->string('ubicacion');
             $table->timestamps();

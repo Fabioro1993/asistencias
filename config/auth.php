@@ -66,21 +66,21 @@ return [
     */
 
     'providers' => [
-        // 'users' => [
-        //     'driver' => 'ldap',
-        //     'model' => LdapRecord\Models\ActiveDirectory\User::class,
-        //     'rules' => [],
-        //     'database' => [
-        //         'model' => App\Models\User::class,
-        //         'sync_passwords' => false,
-        //         'sync_attributes' => \App\Ldap\AttributeHandler::class,               
-        //     ],
-        // ],
-
         'users' => [
-            'driver' => 'database',
-            'table' => 'users',
+            'driver' => 'ldap',
+            'model' => LdapRecord\Models\ActiveDirectory\User::class,
+            'rules' => [],
+            'database' => [
+                'model' => App\Models\User::class,
+                'sync_passwords' => false,
+                'sync_attributes' => \App\Ldap\AttributeHandler::class,               
+            ],
         ],
+
+        // 'users' => [
+        //     'driver' => 'database',
+        //     'table' => 'users',
+        // ],
     ],
 
     /*

@@ -43,48 +43,34 @@ class RegistroCab extends Model
     public function scopeTrabajador($query)
     {
         //agren_trabajador
-        //$emp_agrense = DB::connection('agrense')->table('nmtrabajador')
-
-        $emp_agrense = DB::connection('mysql')->table('agren_trabajador as nmtrabajador')
-                ->selectRaw('"agrense" as empresa, nmtrabajador.CODIGO as CEDULA, CONCAT(nmtrabajador.NOMBRE, " ", nmtrabajador.APELLIDO) As NOMBRE, nmtrabajador.COD_DPTO as depto, nmtrabajador.UBICACION as ubicacion, nmdpto.DEP_DESCRI as descr')
+        //$emp_agrense = DB::connection('mysql')->table('agren_trabajador as nmtrabajador')
+        $emp_agrense = DB::connection('agrense')->table('nmtrabajador')
+                ->selectRaw('"agrense" as empresa, nmtrabajador.CODIGO as CEDULA, CONCAT(nmtrabajador.NOMBRE, " ", nmtrabajador.APELLIDO) As NOMBRE, nmtrabajador.COD_DPTO as depto, nmtrabajador.UBICACION as ubicacion, nmdpto.DEP_DESCRI as descr, CONCAT("agrense", "_", nmtrabajador.COD_DPTO,"_", nmtrabajador.UBICACION) As emp_dep')
                 ->join('nmdpto', 'nmtrabajador.COD_DPTO', '=', 'nmdpto.DEP_CODIGO')
                 ->where('nmtrabajador.CONDICION', '=', 'A')
                 ->whereNotNull('nmtrabajador.UBICACION')->get();
         
-       // $emp_oso = DB::connection('oso')->table('nmtrabajador')
-        $emp_oso = DB::connection('mysql')->table('oso_trabajador as nmtrabajador')
-                ->selectRaw('"oso" as empresa, nmtrabajador.CODIGO as CEDULA, CONCAT(nmtrabajador.NOMBRE, " ", nmtrabajador.APELLIDO) As NOMBRE, nmtrabajador.COD_DPTO as depto, nmtrabajador.UBICACION as ubicacion, nmdpto.DEP_DESCRI as descr')
+        //$emp_oso = DB::connection('mysql')->table('oso_trabajador as nmtrabajador')
+        $emp_oso = DB::connection('oso')->table('nmtrabajador')
+                ->selectRaw('"oso" as empresa, nmtrabajador.CODIGO as CEDULA, CONCAT(nmtrabajador.NOMBRE, " ", nmtrabajador.APELLIDO) As NOMBRE, nmtrabajador.COD_DPTO as depto, nmtrabajador.UBICACION as ubicacion, nmdpto.DEP_DESCRI as descr, CONCAT("oso", "_", nmtrabajador.COD_DPTO,"_", nmtrabajador.UBICACION) As emp_dep')
                 ->join('nmdpto', 'nmtrabajador.COD_DPTO', '=', 'nmdpto.DEP_CODIGO')
                 ->where('nmtrabajador.CONDICION','=' ,'A')
                 ->whereNotNull('nmtrabajador.UBICACION')->get();
-                // ->unionAll($emp_agrense)
-                // ->get();
 
         $result = $emp_agrense->merge($emp_oso);
-
+        
         return $result;
-                
-        //$emp_agrense->union($emp_oso)->get();
-
-        //dd($result);
-
-        // 'SELECT "oso" as empresa, nmoso.nmtrabajador.CODIGO as codigo, CONCAT(nmoso.nmtrabajador.NOMBRE, ' ', nmoso.nmtrabajador.APELLIDO) As Nombre, nmoso.nmtrabajador.COD_DPTO as depto, nmoso.nmtrabajador.UBICACION as ubicacion, nmoso.nmdpto.DEP_DESCRI as descr
+        
+        // SELECT "oso" as empresa, nmoso.nmtrabajador.CODIGO as codigo, CONCAT(nmoso.nmtrabajador.NOMBRE, ' ', nmoso.nmtrabajador.APELLIDO) As Nombre, nmoso.nmtrabajador.COD_DPTO as depto, nmoso.nmtrabajador.UBICACION as ubicacion, nmoso.nmdpto.DEP_DESCRI as descr, CONCAT('oso', '_', nmoso.nmtrabajador.COD_DPTO,'_', nmoso.nmtrabajador.UBICACION) As emp_dep
         // FROM nmoso.nmtrabajador
         // INNER JOIN nmoso.nmdpto ON nmoso.nmdpto.DEP_CODIGO = nmoso.nmtrabajador.COD_DPTO
         // WHERE nmoso.nmtrabajador.CONDICION = "A" AND  nmoso.nmtrabajador.UBICACION IS NOT NULL
         // UNION
-        // SELECT "agrense" as empresa, nmagren.nmtrabajador.CODIGO as codigo, CONCAT(nmagren.nmtrabajador.NOMBRE, ' ', nmagren.nmtrabajador.APELLIDO) As Nombre, nmagren.nmtrabajador.COD_DPTO as depto, nmagren.nmtrabajador.UBICACION as ubicacion, nmagren.nmdpto.DEP_DESCRI as descr
+        // SELECT "agrense" as empresa, nmagren.nmtrabajador.CODIGO as codigo, CONCAT(nmagren.nmtrabajador.NOMBRE, ' ', nmagren.nmtrabajador.APELLIDO) As Nombre, nmagren.nmtrabajador.COD_DPTO as depto, nmagren.nmtrabajador.UBICACION as ubicacion, nmagren.nmdpto.DEP_DESCRI as descr, CONCAT('agrense', '_', nmagren.nmtrabajador.COD_DPTO,'_', nmagren.nmtrabajador.UBICACION) As emp_dep
         // FROM nmagren.nmtrabajador
         // INNER JOIN nmagren.nmdpto ON nmagren.nmdpto.DEP_CODIGO = nmagren.nmtrabajador.COD_DPTO
-        // WHERE nmagren.nmtrabajador.CONDICION = "A" AND nmagren.nmtrabajador.UBICACION IS NOT NULL';
+        // WHERE nmagren.nmtrabajador.CONDICION = "A" AND nmagren.nmtrabajador.UBICACION IS NOT NULL
 
-        // return $fecha_max;
-
-        // $oso = DB::connection('oso')->table('nmtrabajador')
-        //         ->selectRaw('"oso" as empresa, nmoso.nmtrabajador.CODIGO as codigo, CONCAT(nmoso.nmtrabajador.NOMBRE, " ", nmoso.nmtrabajador.APELLIDO) As Nombre, nmoso.nmtrabajador.COD_DPTO as depto, nmoso.nmtrabajador.UBICACION as ubicacion, nmoso.nmdpto.DEP_DESCRI as descr')
-        //         ->join('nmdpto', 'nmtrabajador.COD_DPTO', '=', 'nmdpto.DEP_CODIGO')
-        //         ->where('nmtrabajador.CONDICION', 'A')
-        //         ->whereNotNull('nmtrabajador.UBICACION')->get();
     }
 
 
@@ -316,7 +302,9 @@ class RegistroCab extends Model
 
     public function scopeResumenNomina($query, $id_reg, $gerencia, $ubicacion)
     {
-        $registro_cab = RegistroCab::with('registro_det')->find($id_reg);
+        $registro_cab = RegistroCab::with(["registro_det" => function($a){
+                        $a->orderby('empresa', 'asc');
+                    }])->find($id_reg);
         
         $fecha_max = RegistroCab::fechaMax($registro_cab->fecha);
 

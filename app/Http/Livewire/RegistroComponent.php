@@ -39,8 +39,7 @@ class RegistroComponent extends Component
     public $resumen_gd_sabado = array();   
     public $resumen_gd_domingo = array();
     public $resumen_gd_totales = array();
-
-
+    
     public $old_resm_asistencia = array(); 
     public $old_resm_faltajust = array(); 
     public $old_resm_vacacion = array(); 
@@ -64,12 +63,10 @@ class RegistroComponent extends Component
         $fin_sem = RegistroCab::finSemana(null);
         $user = User::with('permiso')->find(Auth::user()->id);
         foreach ($user->permiso as $key => $value) {
-            
-            $gerencia[] = $value->gerencia;
-            $ubicacion[] = $value->ubicacion;
-        } 
+            $ubi[] = $value->empresa.'_'.$value->gerencia.'_'.$value->ubicacion;
+        }
         
-        $this->oso = RegistroCab::trabajador()->whereIn('depto', $gerencia)->whereIn('ubicacion', $ubicacion);
+        $this->oso = RegistroCab::trabajador()->whereIn('emp_dep', $ubi);
         
         $evaluaciones = Evaluacion::whereIn('id_evaluacion', [1, 2, 3,4])->get();
         $select       = Evaluacion::whereIn('id_evaluacion', [5,6,7,8])->get();
