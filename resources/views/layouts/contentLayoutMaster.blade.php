@@ -32,8 +32,8 @@ License: You must have a valid license purchased only from themeforest(the above
   <meta name="csrf-token" content="{{ csrf_token() }}">
 
   <title>@yield('title') | Control de Asistencias </title>
-  <link rel="apple-touch-icon" href="../../images/favicon/apple-touch-icon-152x152.png">
-  <link rel="shortcut icon" type="image/x-icon" href="../../images/favicon/logo.png">
+  <link rel="apple-touch-icon" href="{{asset('images/favicon/apple-touch-icon-152x152.png')}}">
+  <link rel="shortcut icon" type="image/x-icon" href="{{asset('images/favicon/logo.png')}}">
 
   {{-- Include core + vendor Styles --}}
   @include('panels.styles')
