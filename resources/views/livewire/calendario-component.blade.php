@@ -33,30 +33,33 @@
                 <thead>
                 <tr>
                     <th data-field="id">Responsable</th>
-                    <th data-field="name">Gerencia</th>
+                    <th data-field="name">Gerencias</th>
                     <th data-field="price">Ubicacion</th>
                     <th data-field="price">Detalle</th>
                 </tr>
                 </thead>
                 <tbody>
                     @foreach($registro_modal as $reg)
-                        @foreach($reg->registro_det as $det)
-                            <tr>
-                                <td>{{$reg->responsable->name}}</td>
-                                <td>{{$det->text_geren}}</td>
-                                <td>{{$det->ubicacion}}</td>
-                                <td>
-                                    <div class="invoice-action">
-                                        {{-- <a href="#" wire:click="showUser({{ $user->id }})" class="invoice-action-view mr-4">
-                                            <i class="material-icons">remove_red_eye</i>
-                                        </a> --}}
-                                        <a href="historico/show/{{ $reg->id_registro }}"  class="invoice-action-edit">
-                                            <i class="material-icons">remove_red_eye</i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforeach
+                        <tr>
+                            <td>{{$reg->responsable->name}}</td>
+                            <td>
+                                @foreach($reg->registro_det as $det)
+                                    {{$det->text_geren}} <br>
+                                @endforeach
+                            </td>
+                            <td>
+                                @foreach($reg->registro_det as $det)
+                                    {{$det->ubicacion}}<br>
+                                @endforeach
+                            </td>
+                            <td>
+                                <div class="invoice-action">
+                                    <a href="historico/show/{{ $reg->id_registro }}"  class="invoice-action-edit">
+                                        <i class="material-icons">remove_red_eye</i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
                     @endforeach
                 </tbody>
             </table>
@@ -105,28 +108,18 @@
                     title : '{{ $det->empresa}}',
                     start : '{{ $registro->fecha }}',
                     end   :  '{{ $registro->fecha }}',
-                    id   :  '{{ $registro->id_registro }}',
+                    id    :  '{{ $registro->id_registro }}',
                 },
                 @endforeach
             @endforeach
         ],
-        // eventClick: function(info) {
-        //     window.location.href = "historico/show/"+ info.event.id;
-        // },
         eventClick:  function(info) {
-            //alert('a');
-            //console.log(info.event);
-            
             titulo = info.event.title
-            // $('#modalBody').html(event.description);
-            // $('#eventUrl').attr('href',event.url);
             @this.call('modal', info.event.title, info.event.start)
-            
         }
     });
     fcCalendar.render();
     window.addEventListener('contentChanged', event => {
-
         var may = titulo.charAt(0).toUpperCase() + titulo.slice(1);
         $('#modalTitle').html(may);
         $('#modal1').modal('open');

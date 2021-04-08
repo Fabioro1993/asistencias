@@ -33,18 +33,4 @@ class RegistroSubdet extends Model
     {
         return $this->belongsTo(Evaluacion::class, 'id_evaluacion');
     }
-
-    
-
-    // public function scopeAcumulado($query)
-    // {
-    //     return $query->sum('resultado');
-    //     //dd($query);
-    // //     return $query->selectRaw('RTRIM(WONbr) as OT_select, RTRIM(WODescr) as WODescr, RTRIM(WOHeader.InvtID) as InvtID, RTRIM(WOHeader.User2) as Lote, RTRIM(Inventory.InvtID) as InventoryInvtID,  RTRIM(Inventory.User3) as peso,  RTRIM(Inventory.User5) as tipopeso')
-    // //                  ->join('Inventory', 'WOHeader.InvtID', '=', 'Inventory.InvtID')             
-    // //                  ->where('WOHeader.Status', '=', 'A')
-    // //                  ->where('SiteID', '=', 'PT001')
-    // //                  ->orderBy('OT_select', 'desc')
-    // //                  ->limit(1000);
-    // }
 }

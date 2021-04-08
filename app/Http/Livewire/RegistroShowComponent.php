@@ -16,7 +16,7 @@ class RegistroShowComponent extends Component
     {
         $this->data = RegistroCab::with(["registro_det" => function($a){
             $a->with(["registro_sub" => function($q){
-                $q->where('id_evaluacion', '!=', 11);
+                $q->where('id_evaluacion', '!=', 9);
             }]);
         }])->find($id);
 

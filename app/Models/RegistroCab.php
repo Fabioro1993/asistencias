@@ -148,7 +148,7 @@ class RegistroCab extends Model
         return $query;
     }
     
-    public function scopeResumenEdit($query, $id_reg, $gerencia, $ubicacion)
+    public function scopeResumenEdit($query, $id_reg, $ubi)
     {
         $registro_cab = RegistroCab::with('registro_det')->find($id_reg);
 
@@ -257,7 +257,7 @@ class RegistroCab extends Model
             $resumen_gd_totales[$key]   = ($resultado == 0) ? null : $resultado;
         }
         
-        $nmtrabajador = RegistroCab::trabajador()->whereIn('depto', $gerencia)->whereIn('ubicacion', $ubicacion);
+        $nmtrabajador = RegistroCab::trabajador()->whereIn('emp_dep', $ubi);
         
         foreach ($nmtrabajador as $key => $value) {
             $cedulas_nmtrab[] = $value->CEDULA;

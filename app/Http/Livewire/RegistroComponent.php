@@ -361,7 +361,7 @@ class RegistroComponent extends Component
     public function store($estado)
     {
         foreach ($this->adicionales_input as $key => $value) {
-            $this->asistencia_input[$key][11] = ($value == null) ? 0 : $value ;
+            $this->asistencia_input[$key][9] = ($value == null) ? 0 : $value ;
         }
         
         try {

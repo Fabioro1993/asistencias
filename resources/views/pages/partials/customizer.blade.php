@@ -12,17 +12,17 @@
       <table class="responsive-table">
          <thead>
             <tr>
-               <th data-field="status">Cedula</th>
-               <th data-field="status">Nombre y Apellido</th>
-               <th data-field="status">Dias Asistidos</th>
-               <th data-field="status">Faltas No Justificadas</th>
-               <th data-field="status">Dias de Vacacion</th>
-               <th data-field="status">Horas Extras Diurna</th>
-               <th data-field="status">Horas Extras Nocturno</th>
-               <th data-field="status">Bono Nocturno</th>
-               <th data-field="status">Guardia Sabado</th>
-               <th data-field="status">Guardia Domingo</th>
-               <th data-field="status">Guardias TOTALES</th>             
+               <th class="center">Cedula</th>
+               <th class="center">Nombre y Apellido</th>
+               <th class="center">Dias Asistidos</th>
+               <th class="center">Faltas No Justificadas</th>
+               <th class="center">Dias de Vacacion</th>
+               <th class="center">Horas Extras Diurna</th>
+               <th class="center">Horas Extras Nocturno</th>
+               <th class="center">Bono Nocturno</th>
+               <th class="center">Guardia Sabado</th>
+               <th class="center">Guardia Domingo</th>
+               <th class="center">Guardias TOTALES</th>             
             </tr>
          </thead>
          <tbody>
@@ -30,15 +30,15 @@
             <tr>
                <td class="center">{{$p_oso->CEDULA}}</td>
                <td style="font-size: 11px;">{{$p_oso->NOMBRE }}</td>                                            
-               <td>{{$resumen_asistencia[$p_oso->CEDULA]}}</td>
-               <td>{{$resumen_faltajust[$p_oso->CEDULA]}}</td>
-               <td>{{$resumen_vacacion[$p_oso->CEDULA]}}</td>
-               <td>{{$resumen_hx_diurna[$p_oso->CEDULA]}}</td>
-               <td>{{$resumen_hx_nocturna[$p_oso->CEDULA]}}</td>
-               <td>{{$bono_nocturno[$p_oso->CEDULA]}}</td>
-               <td>{{$resumen_gd_sabado[$p_oso->CEDULA]}}</td>               
-               <td>{{$resumen_gd_domingo[$p_oso->CEDULA]}}</td> 
-               <td>{{$resumen_gd_totales[$p_oso->CEDULA]}}</td>           
+               <td class="center">{{$resumen_asistencia[$p_oso->CEDULA]}}</td>
+               <td class="center">{{$resumen_faltajust[$p_oso->CEDULA]}}</td>
+               <td class="center">{{$resumen_vacacion[$p_oso->CEDULA]}}</td>
+               <td class="center">{{$resumen_hx_diurna[$p_oso->CEDULA]}}</td>
+               <td class="center">{{$resumen_hx_nocturna[$p_oso->CEDULA]}}</td>
+               <td class="center">{{$bono_nocturno[$p_oso->CEDULA]}}</td>
+               <td class="center">{{$resumen_gd_sabado[$p_oso->CEDULA]}}</td>               
+               <td class="center">{{$resumen_gd_domingo[$p_oso->CEDULA]}}</td> 
+               <td class="center">{{$resumen_gd_totales[$p_oso->CEDULA]}}</td>           
             </tr>
             @endforeach
          </tbody>

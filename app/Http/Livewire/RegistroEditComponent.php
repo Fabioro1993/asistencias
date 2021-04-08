@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire;
 
+use App\Models\User;
 use App\Models\Nmdpto;
 use Livewire\Component;
 use App\Models\Evaluacion;
@@ -158,7 +159,7 @@ class RegistroEditComponent extends Component
                     $this->cant_trabaj[$key] = $value;
                 }
             }
-            $this->resumen_edit = RegistroCab::resumenEdit($this->id_reg, $gerencia, $ubicacion);
+            $this->resumen_edit = RegistroCab::resumenEdit($this->id_reg, $ubi);
         }
 
         foreach ($oso as $key => $value) {
@@ -261,38 +262,36 @@ class RegistroEditComponent extends Component
                     $q->where('id_evaluacion', '=', $id_evaluacion);
                 }]);
             }])->find($this->id_reg);
-
+        
         $this->recargar = 1;
-
+        
         if ($id_evaluacion == '2') {
+            if (is_numeric($this->evaluacion[$cedula][$id_evaluacion])) {
+                //Elimino
+                $this->resumen_edit['resumen_hx_diurna'][$cedula] = $this->resumen_edit['resumen_hx_diurna'][$cedula] - $reg_is->registro_det[0]->registro_sub[0]->resultado;
 
-            //Elimino
-            $this->resumen_edit['resumen_hx_diurna'][$cedula] = $this->resumen_edit['resumen_hx_diurna'][$cedula] - $reg_is->registro_det[0]->registro_sub[0]->resultado;
-
-            //Sumo
-            $this->resumen_edit['resumen_hx_diurna'][$cedula] = $this->resumen_edit['resumen_hx_diurna'][$cedula] + $this->evaluacion[$cedula][$id_evaluacion];
-
-            //$this->asistencia_input[$cedula][2] = $this->evaluacion[$cedula.$id_evaluacion];
+                //Sumo
+                $this->resumen_edit['resumen_hx_diurna'][$cedula] = $this->resumen_edit['resumen_hx_diurna'][$cedula] + $this->evaluacion[$cedula][$id_evaluacion];
+            }
         }
         if ($id_evaluacion == '3') {
-           // $this->asistencia_input[$cedula][3] = $this->evaluacion[$cedula.$id_evaluacion];
+            if (is_numeric($this->evaluacion[$cedula][$id_evaluacion])) {
+                //Elimino
+                $this->resumen_edit['resumen_hx_nocturna'][$cedula] = $this->resumen_edit['resumen_hx_nocturna'][$cedula] - $reg_is->registro_det[0]->registro_sub[0]->resultado;
 
-           //Elimino
-           $this->resumen_edit['resumen_hx_nocturna'][$cedula] = $this->resumen_edit['resumen_hx_nocturna'][$cedula] - $reg_is->registro_det[0]->registro_sub[0]->resultado;
-
-           //Sumo
-           $this->resumen_edit['resumen_hx_nocturna'][$cedula] = $this->resumen_edit['resumen_hx_nocturna'][$cedula] + $this->evaluacion[$cedula][$id_evaluacion];
+                //Sumo
+                $this->resumen_edit['resumen_hx_nocturna'][$cedula] = $this->resumen_edit['resumen_hx_nocturna'][$cedula] + $this->evaluacion[$cedula][$id_evaluacion];
+            }
         }
         if ($id_evaluacion == '4') {
-           // $this->asistencia_input[$cedula][4] = $this->evaluacion[$cedula.$id_evaluacion];
+            if (is_numeric($this->evaluacion[$cedula][$id_evaluacion])) {
+                //Elimino
+                $this->resumen_edit['bono_nocturno'][$cedula] = $this->resumen_edit['bono_nocturno'][$cedula] - $reg_is->registro_det[0]->registro_sub[0]->resultado;
 
-           //Elimino
-           $this->resumen_edit['bono_nocturno'][$cedula] = $this->resumen_edit['bono_nocturno'][$cedula] - $reg_is->registro_det[0]->registro_sub[0]->resultado;
-
-           //Sumo
-           $this->resumen_edit['bono_nocturno'][$cedula] = $this->resumen_edit['bono_nocturno'][$cedula] + $this->evaluacion[$cedula][$id_evaluacion];
+                //Sumo
+                $this->resumen_edit['bono_nocturno'][$cedula] = $this->resumen_edit['bono_nocturno'][$cedula] + $this->evaluacion[$cedula][$id_evaluacion];
+            }
         }
-        
     }
 
     public function adicionales($cedula)
@@ -307,7 +306,7 @@ class RegistroEditComponent extends Component
         $evaluacion = $this->evaluacion;
         foreach ($this->adicionales_input as $key => $value) {
             $evaluacion[$key][1] = ($select[$key] == null) ? 0 : $select[$key];
-            $evaluacion[$key][11] = ($value == null) ? 0 : $value ;
+            $evaluacion[$key][9] = ($value == null) ? 0 : $value ;
         }
         
         try {

@@ -44,8 +44,8 @@
                             <label for="nombre" class="active">Responsable</label>
                         </div>  
                         <div class="input-field col s7">
-                            <textarea id="textarea1" class="materialize-textarea" data-length="120" wire:model.defer="observacion"></textarea>
-                            <label for="textarea1">Observacion</label>
+                            <textarea id="textarea" class="materialize-textarea" data-length="120" wire:model.defer="observacion"></textarea>
+                            <label for="textarea">Observacion</label>
                         </div>
                     </div>
                     <div class="col s12">
@@ -84,7 +84,7 @@
                                     </td>
                                     @for ($i = 1; $i < count($evaluaciones); $i++)
                                         <td>
-                                            <input type="number" min="1" max="{{$evaluaciones[$i]->max}}" class="evaluacion"
+                                            <input type="number" min="1" max="{{$evaluaciones[$i]->max}}" class="evaluacion center"
                                             wire:model.defer="evaluacion.{{ $p_oso->CEDULA }}{{$evaluaciones[$i]->id_evaluacion}}"
                                             wire:keyup="evaluacion({{$p_oso->CEDULA}}, '{{$evaluaciones[$i]->id_evaluacion}}')">
                                         </td> 
@@ -131,16 +131,16 @@
 
     <script>
         window.addEventListener('contentChanged', event => {
-            var someValue = @this.select_val;
-            $.each( someValue, function( key, value ) {
+            var selectValue = @this.select_val;
+            $.each( selectValue, function( key, value ) {
                 $('#'+key).val(value);
             })
         });
         
         document.addEventListener('livewire:load', function () {
-            $('input#input_text, textarea#textarea1').characterCounter();
-            var someValue = @this.select_val;
-            $.each( someValue, function( key, value ) {
+            $('input#input_text, textarea#textarea').characterCounter();
+            var selectValue = @this.select_val;
+            $.each( selectValue, function( key, value ) {
                 $('#'+key).val(value);
             })
 
@@ -151,21 +151,17 @@
             Livewire.hook('message.processed', (message, component) => {
                 $('select').select2();
                 
-
                 $(".theme-cutomizer").sidenav({
                     edge: "right"
                 });
-
                 var ps_theme_customiser = new PerfectScrollbar(".theme-cutomizer", {
                     suppressScrollX: true
                 });
-                
             });
 
             @this.on('store', id_rol => {
                 swal({
                     title: "Guardar registro",
-                    // text: "No podrás recuperar este registro!",
                     icon: 'warning',
                     dangerMode: true,
                     buttons: {

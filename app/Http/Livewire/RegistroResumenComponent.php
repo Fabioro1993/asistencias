@@ -92,7 +92,7 @@ class RegistroResumenComponent extends Component
             
             if (count($hist_gd_adicional) > 0) {
                 foreach ($hist_gd_adicional as $key => $val_adic) {
-                    if ($val_adic->id_evaluacion == 11) {
+                    if ($val_adic->id_evaluacion == 9) {
                         $this->adicionales[$value->cedula]  = ($val_adic->asistencia != 0) ? $val_adic->asistencia : null;
                     }
                 }

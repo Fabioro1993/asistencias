@@ -56,8 +56,8 @@
                     <thead>
                         <tr>
                             <th>Gerencia Ubicacion</th>
-                            @foreach ($ubicacion as $item)
-                            <th>{{$item->UBICACION }}</th>
+                            @foreach ($ubicacion as $key => $item)
+                            <th>{{$key}}</th>
                             @endforeach
                         </tr>
                     </thead>
@@ -66,10 +66,10 @@
                         <tr>
                             <td><?PHP echo ucwords($dpto->empresa);?> - <?PHP echo strtoupper($dpto->DEP_DESCRI);?> 
                                  </td>
-                            @foreach ($ubicacion as $item)
+                            @foreach ($ubicacion as $key => $item)
                             <td>
                                 <label>
-                                    <input type="checkbox" wire:model.defer="permiso.{{ $dpto->empresa }}.{{ $dpto->DEP_CODIGO }}.{{$item->UBICACION }}"/>
+                                    <input type="checkbox" wire:model.defer="permiso.{{ $dpto->empresa }}.{{ $dpto->DEP_CODIGO }}.{{$key}}"/>
                                     <span></span>
                                 </label>
                             </td>

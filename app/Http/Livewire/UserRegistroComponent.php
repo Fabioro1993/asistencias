@@ -28,8 +28,8 @@ class UserRegistroComponent extends Component
         $dptos     = Nmdpto::dpto();
         $data      = User::with('estado', 'rol')->get();
         $estados   = Estado::whereIn('id_estado', [1, 2])->get();
-        $ubicacion = Nmtrabajdor::select('UBICACION')->where('UBICACION', '!=', null)->groupby('UBICACION')->get();
-        
+        $ubicacion = Nmtrabajdor::Ubic()->groupby('UBICACION')->toArray();
+      
         if ($this->accion == 'ver') {
             $this->permiso = null;
         }
