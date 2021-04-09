@@ -19,13 +19,14 @@ class RegistroEditComponent extends Component
     public $hidden = 'hidden';
     public $recargar = null;
     public $dept; 
+    public $error = array();
 
     public $comentario = array();
     public $evaluacion = array();
     public $adicionales_input = array();
     public $asistencia_input = array();
     public $cant_trabaj = array();
-    public $empr_trabaj = array();    
+    public $empr_trabaj = array();
 
     public function mount($id)
     {
@@ -111,7 +112,10 @@ class RegistroEditComponent extends Component
                 $this->adicionales_input[$value->cedula] = null;
                 
                 foreach ($value->registro_sub as $key_sub => $val_sub) {
+
+                    $this->error[$value->cedula][$val_sub->id_evaluacion] = 0;
                     $this->evaluacion[$value->cedula][$val_sub->id_evaluacion] = ($val_sub->resultado != 0) ? $val_sub->resultado : null;
+                    
                     if ($val_sub->id_evaluacion == 1) {
                         $this->input_sel[$value->cedula] = $val_sub->resultado;
                         if ($val_sub->resultado === '0') {
@@ -146,6 +150,7 @@ class RegistroEditComponent extends Component
                     foreach ($evaluaciones as $key => $evaluacion) {
                         $this->asistencia_input[$val_resl][$evaluacion->id_evaluacion] = null;
                         $this->evaluacion[$val_resl][$evaluacion->id_evaluacion] = null;
+                        $this->error[$val_resl][$evaluacion->id_evaluacion] = 0;
                     }
                     
                     foreach ($this->eval_reg as $key => $value) {                       
@@ -265,31 +270,54 @@ class RegistroEditComponent extends Component
         
         $this->recargar = 1;
         
-        if ($id_evaluacion == '2') {
-            if (is_numeric($this->evaluacion[$cedula][$id_evaluacion])) {
-                //Elimino
-                $this->resumen_edit['resumen_hx_diurna'][$cedula] = $this->resumen_edit['resumen_hx_diurna'][$cedula] - $reg_is->registro_det[0]->registro_sub[0]->resultado;
+        if (is_numeric($this->evaluacion[$cedula][$id_evaluacion]) || $this->evaluacion[$cedula][$id_evaluacion] == "") {
 
-                //Sumo
-                $this->resumen_edit['resumen_hx_diurna'][$cedula] = $this->resumen_edit['resumen_hx_diurna'][$cedula] + $this->evaluacion[$cedula][$id_evaluacion];
-            }
-        }
-        if ($id_evaluacion == '3') {
-            if (is_numeric($this->evaluacion[$cedula][$id_evaluacion])) {
-                //Elimino
-                $this->resumen_edit['resumen_hx_nocturna'][$cedula] = $this->resumen_edit['resumen_hx_nocturna'][$cedula] - $reg_is->registro_det[0]->registro_sub[0]->resultado;
+            if ($this->evaluacion[$cedula][$id_evaluacion] > 2) {
+                
+                $this->error[$cedula][$id_evaluacion] = 1;
+            }else{
 
-                //Sumo
-                $this->resumen_edit['resumen_hx_nocturna'][$cedula] = $this->resumen_edit['resumen_hx_nocturna'][$cedula] + $this->evaluacion[$cedula][$id_evaluacion];
-            }
-        }
-        if ($id_evaluacion == '4') {
-            if (is_numeric($this->evaluacion[$cedula][$id_evaluacion])) {
-                //Elimino
-                $this->resumen_edit['bono_nocturno'][$cedula] = $this->resumen_edit['bono_nocturno'][$cedula] - $reg_is->registro_det[0]->registro_sub[0]->resultado;
+                if ($this->evaluacion[$cedula][$id_evaluacion] == "") {
+                    $valor = 0;
+                }else{
+                    $valor = $this->evaluacion[$cedula][$id_evaluacion];
+                }
 
-                //Sumo
-                $this->resumen_edit['bono_nocturno'][$cedula] = $this->resumen_edit['bono_nocturno'][$cedula] + $this->evaluacion[$cedula][$id_evaluacion];
+                if ($id_evaluacion == '2') {
+                    //Elimino
+                    $this->resumen_edit['resumen_hx_diurna'][$cedula] = $this->resumen_edit['resumen_hx_diurna'][$cedula] - $reg_is->registro_det[0]->registro_sub[0]->resultado;
+
+                    //Sumo
+                    $this->resumen_edit['resumen_hx_diurna'][$cedula] = $this->resumen_edit['resumen_hx_diurna'][$cedula] + $valor;
+
+                    if ($reg_is->registro_det[0]->registro_sub[0]->resultado == 0) {
+                        $this->resumen_edit['resumen_hx_diurna'][$cedula] = ($valor != 0) ? $valor : null;
+                    }
+                }
+                if ($id_evaluacion == '3') {
+                    //Elimino
+                    $this->resumen_edit['resumen_hx_nocturna'][$cedula] = $this->resumen_edit['resumen_hx_nocturna'][$cedula] - $reg_is->registro_det[0]->registro_sub[0]->resultado;
+
+                    //Sumo
+                    $this->resumen_edit['resumen_hx_nocturna'][$cedula] = $this->resumen_edit['resumen_hx_nocturna'][$cedula] + $valor;
+
+                    if ($reg_is->registro_det[0]->registro_sub[0]->resultado == 0) {
+                        $this->resumen_edit['resumen_hx_nocturna'][$cedula] = ($valor != 0) ? $valor : null;
+                    }
+
+                }
+                if ($id_evaluacion == '4') {
+                    //Elimino
+                    $this->resumen_edit['bono_nocturno'][$cedula] = $this->resumen_edit['bono_nocturno'][$cedula] - $reg_is->registro_det[0]->registro_sub[0]->resultado;
+
+                    //Sumo
+                    $this->resumen_edit['bono_nocturno'][$cedula] = $this->resumen_edit['bono_nocturno'][$cedula] + $valor;
+
+                    if ($reg_is->registro_det[0]->registro_sub[0]->resultado == 0) {
+                        $this->resumen_edit['bono_nocturno'][$cedula] = ($valor != 0) ? $valor : null;
+                    }
+                }
+                $this->error[$cedula][$id_evaluacion] = 0;
             }
         }
     }

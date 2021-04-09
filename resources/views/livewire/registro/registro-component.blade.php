@@ -65,7 +65,7 @@
                             <tbody>
                                 @foreach($oso as $p_oso)
                                 <tr>
-                                    <td class="center">
+                                    <td class="center" style="font-size: 11px;">
                                         <?PHP echo ucwords($p_oso->empresa);?> <br>
                                         {{$p_oso->descr}} <br>
                                         {{$p_oso->ubicacion}}
@@ -85,15 +85,26 @@
                                     @for ($i = 1; $i < count($evaluaciones); $i++)
                                         <td>
                                             <input type="number" min="1" max="{{$evaluaciones[$i]->max}}" class="evaluacion center"
-                                            wire:model.defer="evaluacion.{{ $p_oso->CEDULA }}{{$evaluaciones[$i]->id_evaluacion}}"
+                                            wire:model.defer="evaluacion.{{ $p_oso->CEDULA }}.{{$evaluaciones[$i]->id_evaluacion}}"
                                             wire:keyup="evaluacion({{$p_oso->CEDULA}}, '{{$evaluaciones[$i]->id_evaluacion}}')">
+                                            @if ($error[$p_oso->CEDULA][$evaluaciones[$i]->id_evaluacion] == 1)
+                                                <small class="errorTxt1">
+                                                    <div class="error">El valor debe ser menor a 2</div>
+                                                </small>
+                                            @endif
                                         </td> 
                                     @endfor
                                     <td>
-                                        <input id="comentario" type="text" class="validate" wire:model.defer='comentario.{{ $p_oso->CEDULA }}'>
+                                        <input id="comentario.{{ $p_oso->CEDULA }}" type="text" class="validate"
+                                        wire:model.defer='comentario.{{ $p_oso->CEDULA }}'>
+                                        @error('comentario.'.$p_oso->CEDULA)
+                                            <small class="errorTxt1">
+                                                <div class="error">{{ $message }}</div>
+                                            </small>
+                                        @enderror
                                     </td>
                                     <td {{$hidden}}>
-                                        <input type="number" min="2" max="6" class="adicionales"
+                                        <input type="number" min="2" max="6" class="adicionales center"
                                         wire:model.defer="adicionales.{{ $p_oso->CEDULA }}"
                                         wire:keyup="adicionales({{$p_oso->CEDULA}})">
                                     </td>

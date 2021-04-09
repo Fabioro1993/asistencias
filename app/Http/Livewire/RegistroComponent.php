@@ -13,11 +13,16 @@ use App\Models\RegistroSubdet;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Request;
+
+
 class RegistroComponent extends Component
 {
     public $oso, $fecha, $fecha_min, $fecha_max, $fin_semana, $observacion, $adicionales, $data, $select_val; 
     public $hidden = 'hidden';   
     public $comparar = null;
+    public $error = array();
     
     public $bono = array();
     public $comentario = array();
@@ -71,8 +76,8 @@ class RegistroComponent extends Component
         $evaluaciones = Evaluacion::whereIn('id_evaluacion', [1, 2, 3,4])->get();
         $select       = Evaluacion::whereIn('id_evaluacion', [5,6,7,8])->get();
         
-        if (!isset($this->comparar)) {  
-
+        if (!isset($this->comparar)) {
+            
             //CALCULO DE FECHA DE REGISTRO SELECT-MIN-MAX
             $registro_abierto = RegistroCab::orderBy('fecha','desc')->where('id_estado', 3)->get()->take(1);
             $registro = RegistroCab::orderBy('fecha','desc')->get()->take(1);
@@ -99,8 +104,10 @@ class RegistroComponent extends Component
                 $this->adicionales[$value->CEDULA]          = null;
                 $this->adicionales_input[$value->CEDULA]    = null;
                 $this->select_val[$value->CEDULA] = '0_'.$value->CEDULA;
+
                 foreach ($evaluaciones as $key => $evaluacion) {
                     $this->asistencia_input[$value->CEDULA][$evaluacion->id_evaluacion] = 0;
+                    $this->error[$value->CEDULA][$evaluacion->id_evaluacion] = 0;
                 }
 
                 $sabado = $fin_sem['sabado'];
@@ -324,22 +331,38 @@ class RegistroComponent extends Component
     {
         $this->comparar = $this->cant_trabaj;
         
-        if (isset($this->evaluacion[$cedula.$id_evaluacion])) {
-            if ($id_evaluacion == '2') {
+        if (isset($this->evaluacion[$cedula][$id_evaluacion])
+            && 
+                (is_numeric($this->evaluacion[$cedula][$id_evaluacion]) || $this->evaluacion[$cedula][$id_evaluacion] == "")) {
+            
+            if ($this->evaluacion[$cedula][$id_evaluacion] > 2) {
+                
+                $this->error[$cedula][$id_evaluacion] = 1;
+            }else{
 
-                $this->asistencia_input[$cedula][2] = $this->evaluacion[$cedula.$id_evaluacion];
+                if ($this->evaluacion[$cedula][$id_evaluacion] == "") {
+                    $valor = 0;
+                }else{
+                    $valor = $this->evaluacion[$cedula][$id_evaluacion];
+                }
 
-                $this->resumen_hx_diurna[$cedula] = $this->evaluacion[$cedula.$id_evaluacion];
-            }
-            if ($id_evaluacion == '3') {
-                $this->asistencia_input[$cedula][3] = $this->evaluacion[$cedula.$id_evaluacion];
+                if ($id_evaluacion == '2') {
 
-                $this->resumen_hx_nocturna[$cedula] = $this->evaluacion[$cedula.$id_evaluacion];
-            }
-            if ($id_evaluacion == '4') {
-                $this->asistencia_input[$cedula][4] = $this->evaluacion[$cedula.$id_evaluacion];
+                    $this->asistencia_input[$cedula][2] = $this->evaluacion[$cedula][$id_evaluacion];
 
-                $this->bono_nocturno[$cedula] = $this->evaluacion[$cedula.$id_evaluacion];
+                    $this->resumen_hx_diurna[$cedula]   = $this->old_resm_hx_diurna[$cedula] + $valor;
+                }
+                if ($id_evaluacion == '3') {
+                    $this->asistencia_input[$cedula][3] = $this->evaluacion[$cedula][$id_evaluacion];
+
+                    $this->resumen_hx_nocturna[$cedula] = $this->old_resm_hx_nocturna[$cedula] + $valor;
+                }
+                if ($id_evaluacion == '4') {
+                    $this->asistencia_input[$cedula][4] = $this->evaluacion[$cedula][$id_evaluacion];
+
+                    $this->bono_nocturno[$cedula]       = $this->old_bono_nocturno[$cedula] + $valor;
+                }
+                $this->error[$cedula][$id_evaluacion] = 0;
             }
         }
     }
@@ -358,8 +381,16 @@ class RegistroComponent extends Component
         }
     }
     
-    public function store($estado)
+    public function store(Request $request, $estado)
     {
+        // $this->validate(
+        //     [
+        //         'comentario.*' => 'required'
+        //     ],
+        //     [
+        //         'required' => 'Comentario requerido'
+        //     ]);
+
         foreach ($this->adicionales_input as $key => $value) {
             $this->asistencia_input[$key][9] = ($value == null) ? 0 : $value ;
         }

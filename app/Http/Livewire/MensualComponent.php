@@ -52,7 +52,7 @@ class MensualComponent extends Component
             $ubicacion[] = $value->ubicacion;
         }
         
-        $data = RegistroCab::select(DB::raw('MONTH(fecha) mes, IF( DAY(fecha)<=15,"I","II") AS quincena'),'fecha', 'id_registro', 'id', 'observacion')
+        $data = RegistroCab::select(DB::raw('MONTH(fecha) mes, IF( DAY(fecha)<=15,"I","II") AS quincena'),'fecha', 'id_registro', 'id', 'observacion', 'id_estado')
                             ->with(["registro_det" => function($a)  use ($gerencia, $ubicacion){
                                 $a->whereIn('gerencia', $gerencia)->whereIn('ubicacion', $ubicacion);;
                             }])
