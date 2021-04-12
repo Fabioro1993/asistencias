@@ -28,17 +28,17 @@
          <tbody>
             @foreach($oso as $p_oso)
             <tr>
-               <td class="center">{{$p_oso->CEDULA}}</td>
-               <td style="font-size: 11px;">{{$p_oso->NOMBRE }}</td>                                            
-               <td class="center">{{$resumen_asistencia[$p_oso->CEDULA]}}</td>
-               <td class="center">{{$resumen_faltajust[$p_oso->CEDULA]}}</td>
-               <td class="center">{{$resumen_vacacion[$p_oso->CEDULA]}}</td>
-               <td class="center">{{$resumen_hx_diurna[$p_oso->CEDULA]}}</td>
-               <td class="center">{{$resumen_hx_nocturna[$p_oso->CEDULA]}}</td>
-               <td class="center">{{$bono_nocturno[$p_oso->CEDULA]}}</td>
-               <td class="center">{{$resumen_gd_sabado[$p_oso->CEDULA]}}</td>               
-               <td class="center">{{$resumen_gd_domingo[$p_oso->CEDULA]}}</td> 
-               <td class="center">{{$resumen_gd_totales[$p_oso->CEDULA]}}</td>           
+               <td class="center">{{$p_oso->cedula}}</td>
+               <td style="font-size: 11px;">{{$p_oso->nombre }}</td>                                            
+               <td class="center">{{$resumen_asistencia[$p_oso->cedula]}}</td>
+               <td class="center">{{$resumen_faltajust[$p_oso->cedula]}}</td>
+               <td class="center">{{$resumen_vacacion[$p_oso->cedula]}}</td>
+               <td class="center">{{$resumen_hx_diurna[$p_oso->cedula]}}</td>
+               <td class="center">{{$resumen_hx_nocturna[$p_oso->cedula]}}</td>
+               <td class="center">{{$bono_nocturno[$p_oso->cedula]}}</td>
+               <td class="center">{{$resumen_gd_sabado[$p_oso->cedula]}}</td>               
+               <td class="center">{{$resumen_gd_domingo[$p_oso->cedula]}}</td> 
+               <td class="center">{{$resumen_gd_totales[$p_oso->cedula]}}</td>           
             </tr>
             @endforeach
          </tbody>

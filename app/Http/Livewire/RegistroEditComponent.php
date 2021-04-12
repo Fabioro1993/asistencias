@@ -90,8 +90,8 @@ class RegistroEditComponent extends Component
         $nmtrabajador = RegistroCab::trabajador()->whereIn('emp_dep', $ubi);
 
         foreach ($nmtrabajador as $key => $value) {
-            $cedulas_nmtrab[] = $value->CEDULA;
-            $nmtrab[$value->CEDULA] = $value->NOMBRE;
+            $cedulas_nmtrab[] = $value->cedula;
+            $nmtrab[$value->cedula] = $value->nombre;
         }
         
         $resultado = array_diff($cedulas_nmtrab, $this->cedula_reg);
@@ -99,7 +99,7 @@ class RegistroEditComponent extends Component
         if (count($resultado) >= 1) {
             $oso = $nmtrabajador;
         }
-        
+
         if ($this->recargar == 0) { 
 
             foreach ($this->data->registro_det as $key => $value) {
@@ -137,7 +137,7 @@ class RegistroEditComponent extends Component
 
                 foreach ($resultado as $key_resl => $val_resl) {
 
-                    $new_trab = RegistroCab::trabajador()->whereIn('CEDULA', $val_resl)->first();
+                    $new_trab = RegistroCab::trabajador()->whereIn('cedula', $val_resl)->first();
                     
                     $this->comentario[$val_resl] = null;
                     $this->adicionales_input[$val_resl] = null;
@@ -167,9 +167,9 @@ class RegistroEditComponent extends Component
             $this->resumen_edit = RegistroCab::resumenEdit($this->id_reg, $ubi);
         }
 
-        foreach ($oso as $key => $value) {
-            $value['descr'] = $this->dept[$value->gerencia];
-        }
+        // foreach ($oso as $key => $value) {
+        //     $value['descr'] = $this->dept[$value->gerencia];
+        // }
 
         return view('livewire.registro.registro-edit-component', compact('evaluaciones', 'select', 'oso'))
                 ->layout('layouts.contentLayoutMaster', compact('pageConfigs', 'breadcrumbs'));
@@ -391,5 +391,4 @@ class RegistroEditComponent extends Component
             throw $th;
         }
     }
-
 }

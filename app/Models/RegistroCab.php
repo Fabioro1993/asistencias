@@ -45,14 +45,14 @@ class RegistroCab extends Model
         //agren_trabajador
         //$emp_agrense = DB::connection('mysql')->table('agren_trabajador as nmtrabajador')
         $emp_agrense = DB::connection('agrense')->table('nmtrabajador')
-                ->selectRaw('"agrense" as empresa, nmtrabajador.CODIGO as CEDULA, CONCAT(nmtrabajador.NOMBRE, " ", nmtrabajador.APELLIDO) As NOMBRE, nmtrabajador.COD_DPTO as depto, nmtrabajador.UBICACION as ubicacion, nmdpto.DEP_DESCRI as descr, CONCAT("agrense", "_", nmtrabajador.COD_DPTO,"_", nmtrabajador.UBICACION) As emp_dep')
+                ->selectRaw('"agrense" as empresa, nmtrabajador.CODIGO as cedula, CONCAT(nmtrabajador.NOMBRE, " ", nmtrabajador.APELLIDO) As nombre, nmtrabajador.COD_DPTO as depto, nmtrabajador.UBICACION as ubicacion, nmdpto.DEP_DESCRI as descr, CONCAT("agrense", "_", nmtrabajador.COD_DPTO,"_", nmtrabajador.UBICACION) As emp_dep')
                 ->join('nmdpto', 'nmtrabajador.COD_DPTO', '=', 'nmdpto.DEP_CODIGO')
                 ->where('nmtrabajador.CONDICION', '=', 'A')
                 ->whereNotNull('nmtrabajador.UBICACION')->get();
         
         //$emp_oso = DB::connection('mysql')->table('oso_trabajador as nmtrabajador')
         $emp_oso = DB::connection('oso')->table('nmtrabajador')
-                ->selectRaw('"oso" as empresa, nmtrabajador.CODIGO as CEDULA, CONCAT(nmtrabajador.NOMBRE, " ", nmtrabajador.APELLIDO) As NOMBRE, nmtrabajador.COD_DPTO as depto, nmtrabajador.UBICACION as ubicacion, nmdpto.DEP_DESCRI as descr, CONCAT("oso", "_", nmtrabajador.COD_DPTO,"_", nmtrabajador.UBICACION) As emp_dep')
+                ->selectRaw('"oso" as empresa, nmtrabajador.CODIGO as cedula, CONCAT(nmtrabajador.NOMBRE, " ", nmtrabajador.APELLIDO) As nombre, nmtrabajador.COD_DPTO as depto, nmtrabajador.UBICACION as ubicacion, nmdpto.DEP_DESCRI as descr, CONCAT("oso", "_", nmtrabajador.COD_DPTO,"_", nmtrabajador.UBICACION) As emp_dep')
                 ->join('nmdpto', 'nmtrabajador.COD_DPTO', '=', 'nmdpto.DEP_CODIGO')
                 ->where('nmtrabajador.CONDICION','=' ,'A')
                 ->whereNotNull('nmtrabajador.UBICACION')->get();
@@ -201,15 +201,15 @@ class RegistroCab extends Model
                     }
                 }
             }else{
-                $resumen_asistencia[$value->CEDULA]   = null; 
-                $resumen_hx_diurna[$value->CEDULA]    = null; 
-                $resumen_hx_nocturna[$value->CEDULA]  = null; 
-                $bono_nocturno[$value->CEDULA]        = null;
-                $resumen_faltajust[$value->CEDULA]    = null;
-                $resumen_vacacion[$value->CEDULA]     = null;
-                $resumen_reposo[$value->CEDULA]       = null;
-                $resumen_permiso[$value->CEDULA]      = null;
-                $adicionales[$value->CEDULA]          = null;
+                $resumen_asistencia[$value->cedula]   = null; 
+                $resumen_hx_diurna[$value->cedula]    = null; 
+                $resumen_hx_nocturna[$value->cedula]  = null; 
+                $bono_nocturno[$value->cedula]        = null;
+                $resumen_faltajust[$value->cedula]    = null;
+                $resumen_vacacion[$value->cedula]     = null;
+                $resumen_reposo[$value->cedula]       = null;
+                $resumen_permiso[$value->cedula]      = null;
+                $adicionales[$value->cedula]          = null;
             }
 
             $hist_gd_adicional = RegistroCab::guardiaAdional($value->cedula, $mes);
@@ -260,7 +260,7 @@ class RegistroCab extends Model
         $nmtrabajador = RegistroCab::trabajador()->whereIn('emp_dep', $ubi);
         
         foreach ($nmtrabajador as $key => $value) {
-            $cedulas_nmtrab[] = $value->CEDULA;
+            $cedulas_nmtrab[] = $value->cedula;
         }
         
         $resultado = array_diff($cedulas_nmtrab, $cedula_reg);

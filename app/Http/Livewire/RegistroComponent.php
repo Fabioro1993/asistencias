@@ -93,25 +93,25 @@ class RegistroComponent extends Component
             $this->fecha     = $this->fecha_min;            
 
             foreach ($this->oso as $key => $value) {
-                $this->cant_trabaj[$value->CEDULA]          = $value->NOMBRE;
+                $this->cant_trabaj[$value->cedula]          = $value->nombre;
 
-                $this->empr_trabaj[$value->CEDULA][]          = $value->empresa;
-                $this->empr_trabaj[$value->CEDULA][]          = $value->depto;
-                $this->empr_trabaj[$value->CEDULA][]          = $value->ubicacion;
+                $this->empr_trabaj[$value->cedula][]          = $value->empresa;
+                $this->empr_trabaj[$value->cedula][]          = $value->depto;
+                $this->empr_trabaj[$value->cedula][]          = $value->ubicacion;
                 
-                $this->resumen_gd_totales[$value->CEDULA]   = null;
-                $this->comentario[$value->CEDULA]           = null;
-                $this->adicionales[$value->CEDULA]          = null;
-                $this->adicionales_input[$value->CEDULA]    = null;
-                $this->select_val[$value->CEDULA] = '0_'.$value->CEDULA;
+                $this->resumen_gd_totales[$value->cedula]   = null;
+                $this->comentario[$value->cedula]           = null;
+                $this->adicionales[$value->cedula]          = null;
+                $this->adicionales_input[$value->cedula]    = null;
+                $this->select_val[$value->cedula] = '0_'.$value->cedula;
 
                 foreach ($evaluaciones as $key => $evaluacion) {
-                    $this->asistencia_input[$value->CEDULA][$evaluacion->id_evaluacion] = 0;
-                    $this->error[$value->CEDULA][$evaluacion->id_evaluacion] = 0;
+                    $this->asistencia_input[$value->cedula][$evaluacion->id_evaluacion] = 0;
+                    $this->error[$value->cedula][$evaluacion->id_evaluacion] = 0;
                 }
 
                 $sabado = $fin_sem['sabado'];
-                $hist_regi_sabd = RegistroCab::resumenFinSemana($value->CEDULA, $sabado, null);
+                $hist_regi_sabd = RegistroCab::resumenFinSemana($value->cedula, $sabado, null);
 
                 if (count($hist_regi_sabd) > 0) {
                     foreach ($hist_regi_sabd as $key => $val_sab) {
@@ -120,11 +120,11 @@ class RegistroComponent extends Component
                         }
                     }
                 }else{
-                    $this->resumen_gd_sabado[$value->CEDULA]   = null;
+                    $this->resumen_gd_sabado[$value->cedula]   = null;
                 }
 
                 $domingo = $fin_sem['domingo'];
-                $hist_regi_domg = RegistroCab::resumenFinSemana($value->CEDULA, $domingo, null);
+                $hist_regi_domg = RegistroCab::resumenFinSemana($value->cedula, $domingo, null);
 
                 if (count($hist_regi_domg) > 0) {
                     foreach ($hist_regi_domg as $key => $val_domg) {
@@ -133,7 +133,7 @@ class RegistroComponent extends Component
                         }
                     }
                 }else{
-                    $this->resumen_gd_domingo[$value->CEDULA]   = null;
+                    $this->resumen_gd_domingo[$value->cedula]   = null;
                 }
                 
                 $hist_regi = DB::table('registros_subdet')
@@ -147,7 +147,7 @@ class RegistroComponent extends Component
                 ->join('registros_det', 'registros_subdet.id_reg_det', '=', 'registros_det.id_reg_det')
                 ->join('registros_cab', 'registros_det.id_registro', '=', 'registros_cab.id_registro')
                 ->whereMonth('fecha', date("m"))
-                ->where('cedula', $value->CEDULA)
+                ->where('cedula', $value->cedula)
                 ->groupBy('id_evaluacion', 'cedula')
                 ->get();
 
@@ -171,14 +171,14 @@ class RegistroComponent extends Component
                         }
                     }
                 }else{
-                    $this->resumen_asistencia[$value->CEDULA]   = null; 
-                    $this->resumen_hx_diurna[$value->CEDULA]    = null; 
-                    $this->resumen_hx_nocturna[$value->CEDULA]  = null; 
-                    $this->bono_nocturno[$value->CEDULA]        = null;
-                    $this->resumen_faltajust[$value->CEDULA]    = null;
-                    $this->resumen_vacacion[$value->CEDULA]     = null;
-                    $this->resumen_reposo[$value->CEDULA]       = null;
-                    $this->resumen_permiso[$value->CEDULA]      = null;
+                    $this->resumen_asistencia[$value->cedula]   = null; 
+                    $this->resumen_hx_diurna[$value->cedula]    = null; 
+                    $this->resumen_hx_nocturna[$value->cedula]  = null; 
+                    $this->bono_nocturno[$value->cedula]        = null;
+                    $this->resumen_faltajust[$value->cedula]    = null;
+                    $this->resumen_vacacion[$value->cedula]     = null;
+                    $this->resumen_reposo[$value->cedula]       = null;
+                    $this->resumen_permiso[$value->cedula]      = null;
                 }
             }
             
