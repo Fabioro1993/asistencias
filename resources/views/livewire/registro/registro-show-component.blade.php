@@ -68,7 +68,7 @@
                                     <td class="users-view-name">{{$registro_dt->nombre}}</td>
                                     @foreach($registro_dt->registro_sub as $sub)
                                     <th class="center">
-                                        {{($sub->resultado == 0) ? ' ' : $sub->resultado}}
+                                        {{($sub->resultado === '0') ? ' ' : $sub->resultado}}
                                     </th>
                                     @endforeach
                                     <td class="users-view-email">{{$registro_dt->comentario}}</td>

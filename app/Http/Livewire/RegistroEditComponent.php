@@ -17,7 +17,7 @@ class RegistroEditComponent extends Component
 {
     public $data, $observacion, $select_val, $id_reg, $cedula_reg, $eval_reg, $asistencia, $resumen_edit, $fin_semana, $adicionales, $input_sel;
     public $hidden = 'hidden';
-    public $recargar = null;
+    public $recargar = 0;
     public $dept; 
     public $error = array();
 
@@ -99,8 +99,8 @@ class RegistroEditComponent extends Component
         if (count($resultado) >= 1) {
             $oso = $nmtrabajador;
         }
-            
-        if (!isset($this->recargar)) { 
+        
+        if ($this->recargar == 0) { 
 
             foreach ($this->data->registro_det as $key => $value) {
                 
@@ -261,14 +261,14 @@ class RegistroEditComponent extends Component
 
     public function evaluacion($cedula, $id_evaluacion)
     {
+        $this->recargar = 1;
+
         $reg_is = RegistroCab::with(["registro_det" => function($a) use ($cedula, $id_evaluacion){
             $a->where('cedula', '=', $cedula)
                 ->with(["registro_sub" => function($q) use ($id_evaluacion){
                     $q->where('id_evaluacion', '=', $id_evaluacion);
                 }]);
             }])->find($this->id_reg);
-        
-        $this->recargar = 1;
         
         if (is_numeric($this->evaluacion[$cedula][$id_evaluacion]) || $this->evaluacion[$cedula][$id_evaluacion] == "") {
 
@@ -319,6 +319,7 @@ class RegistroEditComponent extends Component
                 }
                 $this->error[$cedula][$id_evaluacion] = 0;
             }
+            $this->dispatchBrowserEvent('contentChanged');
         }
     }
 

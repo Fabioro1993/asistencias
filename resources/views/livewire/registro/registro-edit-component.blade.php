@@ -64,13 +64,13 @@
                                     <td class="center">{{$p_oso->cedula}}</td>
                                     <td style="font-size: 11px;">{{$p_oso->nombre }}</td>                                            
                                     <td>
-                                        <select class="select2 browser-default" wire:model="asistencia" id="{{ $p_oso->CEDULA }}"
+                                        <select class="select2 browser-default" wire:model="asistencia" id="{{ $p_oso->cedula }}"
                                             wire:ignore>
-                                                <option value="0_{{ $p_oso->CEDULA }}">0</option>
-                                                <option value="1_{{ $p_oso->CEDULA }}">1</option>
-                                                @foreach($select as $estado)
-                                                    <option value="{{ $estado->id_evaluacion }}_{{ $p_oso->CEDULA }}"> {{ $estado->abrv }}</option>
-                                                @endforeach
+                                            <option value="0_{{ $p_oso->cedula }}">0</option>
+                                            <option value="1_{{ $p_oso->cedula }}">1</option>
+                                            @foreach($select as $estado)
+                                                <option value="{{ $estado->id_evaluacion }}_{{ $p_oso->cedula }}"> {{ $estado->abrv }}</option>
+                                            @endforeach
                                         </select>
                                     </td>
                                     @for ($i = 1; $i < count($evaluaciones); $i++)
@@ -134,8 +134,8 @@
 
     <script>
         window.addEventListener('contentChanged', event => {
-            var someValue = @this.select_val;
-            $.each( someValue, function( key, value ) {
+            var seletVal = @this.select_val;
+            $.each( seletVal, function( key, value ) {
                 $('#'+key).val(value);
             })
         });
@@ -143,8 +143,8 @@
         document.addEventListener('livewire:load', function () {
             $('input#input_text, textarea#textarea1').characterCounter();
             
-            var someValue = @this.select_val;
-            $.each( someValue, function( key, value ) {
+            var seletVal = @this.select_val;
+            $.each( seletVal, function( key, value ) {
                 $('#'+key).val(value);
             })
             
@@ -161,7 +161,6 @@
                 var ps_theme_customiser = new PerfectScrollbar(".theme-cutomizer", {
                     suppressScrollX: true
                 });
-                
             });
 
             @this.on('update', id_rol => {
