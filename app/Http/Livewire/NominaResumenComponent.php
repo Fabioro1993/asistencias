@@ -46,7 +46,7 @@ class NominaResumenComponent extends Component
                                 $this->id_reg = $this->id_reg->whereDay('fecha', '>',15)->get()->last()->id_registro;
                             }
         
-        $dptos = Nmdpto::all();
+        $dptos = Nmdpto::dpto();
         foreach ($dptos as $key => $value) {
             $this->dept[$value->DEP_CODIGO] =  $value->DEP_DESCRI;
         }
@@ -84,7 +84,7 @@ class NominaResumenComponent extends Component
 
         $resumen = RegistroCab::resumenNomina($id, $gerencia, $ubicacion);
 
-        $dptos = Nmdpto::all();
+        $dptos = Nmdpto::dpto();
         foreach ($dptos as $key => $value) {
             $dept[$value->DEP_CODIGO] =  $value->DEP_DESCRI;
         }
