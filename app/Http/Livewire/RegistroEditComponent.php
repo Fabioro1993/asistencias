@@ -65,7 +65,7 @@ class RegistroEditComponent extends Component
         //Pageheader set true for breadcrumbs
         $pageConfigs = ['pageHeader' => true];
 
-        $dptos = Nmdpto::all();
+        $dptos = Nmdpto::dpto();
         foreach ($dptos as $key => $value) {
             $this->dept[$value->DEP_CODIGO] =  $value->DEP_DESCRI;
         }
@@ -166,11 +166,7 @@ class RegistroEditComponent extends Component
             }
             $this->resumen_edit = RegistroCab::resumenEdit($this->id_reg, $ubi);
         }
-
-        // foreach ($oso as $key => $value) {
-        //     $value['descr'] = $this->dept[$value->gerencia];
-        // }
-
+        
         return view('livewire.registro.registro-edit-component', compact('evaluaciones', 'select', 'oso'))
                 ->layout('layouts.contentLayoutMaster', compact('pageConfigs', 'breadcrumbs'));
     }
