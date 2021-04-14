@@ -46,10 +46,7 @@ class NominaResumenComponent extends Component
                                 $this->id_reg = $this->id_reg->whereDay('fecha', '>',15)->get()->last()->id_registro;
                             }
         
-        $dptos = Nmdpto::dpto();
-        foreach ($dptos as $key => $value) {
-            $this->dept[$value->DEP_CODIGO] =  $value->DEP_DESCRI;
-        }
+        $this->dept = Nmdpto::dptoArray();
     }
 
     public function render()
@@ -62,13 +59,7 @@ class NominaResumenComponent extends Component
         //Pageheader set true for breadcrumbs
         $pageConfigs = ['pageHeader' => true];
 
-        $user = User::with('permiso')->find(Auth::user()->id);
-        foreach ($user->permiso as $key => $value) {            
-            $gerencia[] = $value->gerencia;
-            $ubicacion[] = $value->ubicacion;
-        }
-
-        $resumen = RegistroCab::resumenNomina($this->id_reg, $gerencia, $ubicacion);
+        $resumen = RegistroCab::resumenNomina($this->id_reg);
 
         return view('livewire.nomina.nomina-resumen-component', compact('resumen'))
                 ->layout('layouts.contentLayoutMaster', compact('pageConfigs', 'breadcrumbs'));
@@ -76,18 +67,9 @@ class NominaResumenComponent extends Component
 
     public function pdf($id)
     {
-        $user = User::with('permiso')->find(Auth::user()->id);
-        foreach ($user->permiso as $key => $value) {            
-            $gerencia[] = $value->gerencia;
-            $ubicacion[] = $value->ubicacion;
-        }
+        $resumen = RegistroCab::resumenNomina($id);
 
-        $resumen = RegistroCab::resumenNomina($id, $gerencia, $ubicacion);
-
-        $dptos = Nmdpto::dpto();
-        foreach ($dptos as $key => $value) {
-            $dept[$value->DEP_CODIGO] =  $value->DEP_DESCRI;
-        }
+        $dptos = Nmdpto::dptoArray();
         
         if (date("d", strtotime($resumen['fecha_max'])) <= '15') {
             $quincena = $this->meses[date("n", strtotime($resumen['fecha_max']))].' I';

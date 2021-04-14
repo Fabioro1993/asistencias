@@ -30,8 +30,8 @@ class MensualComponent extends Component
 
     public function mount($mes, $anio)
     {
-        $this->mes = $mes;
-        $this->anio = $anio;
+        $this->mes      = $mes;
+        $this->anio     = $anio;
         $this->mes_text = $this->meses[$mes];
     }
 
@@ -46,9 +46,8 @@ class MensualComponent extends Component
         $pageConfigs = ['pageHeader' => true];
         
         $user = User::with('permiso')->find(Auth::user()->id);
-        
         foreach ($user->permiso as $key => $value) { 
-            $gerencia[] = $value->gerencia;
+            $gerencia[]  = $value->gerencia;
             $ubicacion[] = $value->ubicacion;
         }
         

@@ -65,10 +65,7 @@ class RegistroEditComponent extends Component
         //Pageheader set true for breadcrumbs
         $pageConfigs = ['pageHeader' => true];
 
-        $dptos = Nmdpto::dpto();
-        foreach ($dptos as $key => $value) {
-            $this->dept[$value->DEP_CODIGO] =  $value->DEP_DESCRI;
-        }
+        $this->dept = Nmdpto::dptoArray();
 
         $this->observacion  = $this->data->observacion;
         $evaluaciones       = Evaluacion::whereIn('id_evaluacion', [1, 2, 3,4])->get();

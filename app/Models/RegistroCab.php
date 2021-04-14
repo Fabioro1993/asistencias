@@ -43,15 +43,15 @@ class RegistroCab extends Model
     public function scopeTrabajador($query)
     {
         //agren_trabajador
-        //$emp_agrense = DB::connection('mysql')->table('agren_trabajador as nmtrabajador')
-        $emp_agrense = DB::connection('agrense')->table('nmtrabajador')
+        $emp_agrense = DB::connection('mysql')->table('agren_trabajador as nmtrabajador')
+        //$emp_agrense = DB::connection('agrense')->table('nmtrabajador')
                 ->selectRaw('"agrense" as empresa, nmtrabajador.CODIGO as cedula, CONCAT(nmtrabajador.NOMBRE, " ", nmtrabajador.APELLIDO) As nombre, nmtrabajador.COD_DPTO as depto, nmtrabajador.UBICACION as ubicacion, nmdpto.DEP_DESCRI as descr, CONCAT("agrense", "_", nmtrabajador.COD_DPTO,"_", nmtrabajador.UBICACION) As emp_dep')
                 ->join('nmdpto', 'nmtrabajador.COD_DPTO', '=', 'nmdpto.DEP_CODIGO')
                 ->where('nmtrabajador.CONDICION', '=', 'A')
                 ->whereNotNull('nmtrabajador.UBICACION')->get();
         
-        //$emp_oso = DB::connection('mysql')->table('oso_trabajador as nmtrabajador')
-        $emp_oso = DB::connection('oso')->table('nmtrabajador')
+        $emp_oso = DB::connection('mysql')->table('oso_trabajador as nmtrabajador')
+        //$emp_oso = DB::connection('oso')->table('nmtrabajador')
                 ->selectRaw('"oso" as empresa, nmtrabajador.CODIGO as cedula, CONCAT(nmtrabajador.NOMBRE, " ", nmtrabajador.APELLIDO) As nombre, nmtrabajador.COD_DPTO as depto, nmtrabajador.UBICACION as ubicacion, nmdpto.DEP_DESCRI as descr, CONCAT("oso", "_", nmtrabajador.COD_DPTO,"_", nmtrabajador.UBICACION) As emp_dep')
                 ->join('nmdpto', 'nmtrabajador.COD_DPTO', '=', 'nmdpto.DEP_CODIGO')
                 ->where('nmtrabajador.CONDICION','=' ,'A')
@@ -74,7 +74,26 @@ class RegistroCab extends Model
     }
 
 
+    public function scopeHistorico($query, $mes, $cedula)
+    {
+        $hist_regi = DB::table('registros_subdet')
+                ->select(
+                    DB::raw('SUM(resultado) as asistencia,
+                    COUNT(IF(resultado = "F", 1, NULL)) "falta",
+                    COUNT(IF(resultado = "V", 1, NULL)) "vacacion",
+                    COUNT(IF(resultado = "R", 1, NULL)) "reposo",
+                    COUNT(IF(resultado = "P", 1, NULL)) "permiso"'),
+                    'id_evaluacion', 'registros_det.cedula')
+                ->join('registros_det', 'registros_subdet.id_reg_det', '=', 'registros_det.id_reg_det')
+                ->join('registros_cab', 'registros_det.id_registro', '=', 'registros_cab.id_registro')
+                ->whereMonth('fecha', $mes)
+                ->where('cedula', $cedula)
+                ->groupBy('id_evaluacion', 'cedula')
+                ->get();
 
+        return $hist_regi;
+    }
+    
     public function scopeFechaMax($query, $fecha)
     {
         $fecha_prop = ($fecha == null) ? date("Y-m-d") : $fecha ;
@@ -113,7 +132,7 @@ class RegistroCab extends Model
     {
         $mes   = ($fecha == null) ? date("m") : $fecha;
         
-        $query = DB::table('registros_subdet')
+        $calculo = DB::table('registros_subdet')
                     ->select(  DB::raw('SUM(resultado) as asistencia'), 'id_evaluacion', 'registros_det.cedula')
                     ->join('registros_det', 'registros_subdet.id_reg_det', '=', 'registros_det.id_reg_det')
                     ->join('registros_cab', 'registros_det.id_registro', '=', 'registros_cab.id_registro')
@@ -126,9 +145,19 @@ class RegistroCab extends Model
                         }
                     })
                     ->groupBy('id_evaluacion', 'cedula')
-                    ->get();
+                    ->get();                    
         
-        return $query;
+        if (count($calculo) > 0) {
+            foreach ($calculo as $key => $value) {
+                if ($value->id_evaluacion == 1) {
+                    $resumen_gd_fds   = ($value->asistencia != 0) ? $value->asistencia : 0;
+                }
+            }
+        }else{
+            $resumen_gd_fds = 0;
+        }
+        
+        return $resumen_gd_fds;
     }
 
     public function scopeGuardiaAdional($query, $cedula, $fecha)
@@ -150,7 +179,9 @@ class RegistroCab extends Model
     
     public function scopeResumenEdit($query, $id_reg, $ubi)
     {
-        $registro_cab = RegistroCab::with('registro_det')->find($id_reg);
+        $registro_cab = RegistroCab::with(["registro_det" => function($a){
+            $a->orderby('empresa', 'asc');
+        }])->find($id_reg);
 
         foreach ($registro_cab->registro_det as $key => $value) {
             $cedula_reg[] = $value->cedula;
@@ -165,22 +196,9 @@ class RegistroCab extends Model
         foreach ($registro_cab->registro_det as $key => $value) {
 
             $resumen_gd_totales[$value->cedula]   = null;
-        
-            $hist_regi = DB::table('registros_subdet')
-            ->select(
-                DB::raw('SUM(resultado) as asistencia,
-                COUNT(IF(resultado = "F", 1, NULL)) "falta",
-                COUNT(IF(resultado = "V", 1, NULL)) "vacacion",
-                COUNT(IF(resultado = "R", 1, NULL)) "reposo",
-                COUNT(IF(resultado = "P", 1, NULL)) "permiso"'),
-                'id_evaluacion', 'registros_det.cedula')
-            ->join('registros_det', 'registros_subdet.id_reg_det', '=', 'registros_det.id_reg_det')
-            ->join('registros_cab', 'registros_det.id_registro', '=', 'registros_cab.id_registro')
-            ->whereMonth('fecha', $mes)
-            ->where('cedula', $value->cedula)
-            ->groupBy('id_evaluacion', 'cedula')
-            ->get();
-
+            
+            $hist_regi = RegistroCab::historico($mes, $value->cedula);
+            
             if (count($hist_regi) > 0) {
                 foreach ($hist_regi as $key => $value) {
                     if ($value->id_evaluacion == 1) {
@@ -225,30 +243,13 @@ class RegistroCab extends Model
             }
 
             $sabado = $fin_sem['sabado'];
-            $hist_regi_sabd = RegistroCab::resumenFinSemana($value->cedula, $sabado, $mes);
-
-            if (count($hist_regi_sabd) > 0) {
-                foreach ($hist_regi_sabd as $key => $val_sab) {
-                    if ($val_sab->id_evaluacion == 1) {
-                        $resumen_gd_sabado[$val_sab->cedula]   = ($val_sab->asistencia != 0) ? $val_sab->asistencia : null;
-                    }
-                }
-            }else{
-                $resumen_gd_sabado[$value->cedula]   = null;
-            }
-
+            $resumen_sabado = RegistroCab::resumenFinSemana($value->cedula, $sabado, $mes);
+            $resumen_gd_sabado[$value->cedula] = ($resumen_sabado != 0) ? $resumen_sabado : null;
+            
             $domingo = $fin_sem['domingo'];
-            $hist_regi_domg = RegistroCab::resumenFinSemana($value->cedula, $domingo,$mes);
+            $resumen_domingo = RegistroCab::resumenFinSemana($value->cedula, $domingo, $mes);
+            $resumen_gd_domingo[$value->cedula] = ($resumen_domingo != 0) ? $resumen_domingo : null;
 
-            if (count($hist_regi_domg) > 0) {
-                foreach ($hist_regi_domg as $key => $val_domg) {
-                    if ($val_domg->id_evaluacion == 1) {
-                        $resumen_gd_domingo[$val_domg->cedula]   = ($val_domg->asistencia != 0) ? $val_domg->asistencia : null;
-                    }
-                }
-            }else{
-                $resumen_gd_domingo[$value->cedula]   = null;
-            }
         }
 
         //CALCULO DE GUARDIAS TOTALES
@@ -300,7 +301,7 @@ class RegistroCab extends Model
         return $data;
     }
 
-    public function scopeResumenNomina($query, $id_reg, $gerencia, $ubicacion)
+    public function scopeResumenNomina($query, $id_reg)
     {
         $registro_cab = RegistroCab::with(["registro_det" => function($a){
                         $a->orderby('empresa', 'asc');
@@ -320,21 +321,8 @@ class RegistroCab extends Model
             
             $resumen_gd_totales[$det->gerencia][$det->cedula]   = null;
         
-            $hist_regi = DB::table('registros_subdet')
-                    ->select(
-                        DB::raw('SUM(resultado) as asistencia,
-                        COUNT(IF(resultado = "F", 1, NULL)) "falta",
-                        COUNT(IF(resultado = "V", 1, NULL)) "vacacion",
-                        COUNT(IF(resultado = "R", 1, NULL)) "reposo",
-                        COUNT(IF(resultado = "P", 1, NULL)) "permiso"'),
-                        'id_evaluacion', 'registros_det.cedula')
-                    ->join('registros_det', 'registros_subdet.id_reg_det', '=', 'registros_det.id_reg_det')
-                    ->join('registros_cab', 'registros_det.id_registro', '=', 'registros_cab.id_registro')
-                    ->whereMonth('fecha', $mes)
-                    ->where('cedula', $det->cedula)
-                    ->groupBy('id_evaluacion', 'cedula')
-                    ->get();
-
+            $hist_regi = RegistroCab::historico($mes, $det->cedula);
+             
             if (count($hist_regi) > 0) {
                 foreach ($hist_regi as $key => $value) {
                     
@@ -380,30 +368,12 @@ class RegistroCab extends Model
             }
 
             $sabado = $fin_sem['sabado'];
-            $hist_regi_sabd = RegistroCab::resumenFinSemana($det->cedula, $sabado, $mes);
-
-            if (count($hist_regi_sabd) > 0) {
-                foreach ($hist_regi_sabd as $key => $val_sab) {
-                    if ($val_sab->id_evaluacion == 1) {
-                        $resumen_gd_sabado[$det->gerencia][$val_sab->cedula]   = ($val_sab->asistencia != 0) ? $val_sab->asistencia : null;
-                    }
-                }
-            }else{
-                $resumen_gd_sabado[$det->gerencia][$det->cedula]   = null;
-            }
+            $resumen_sabado = RegistroCab::resumenFinSemana($det->cedula, $sabado, $mes);
+            $resumen_gd_sabado[$det->gerencia][$det->cedula] = ($resumen_sabado != 0) ? $resumen_sabado : null;
 
             $domingo = $fin_sem['domingo'];
-            $hist_regi_domg = RegistroCab::resumenFinSemana($det->cedula, $domingo,$mes);
-
-            if (count($hist_regi_domg) > 0) {
-                foreach ($hist_regi_domg as $key => $val_domg) {
-                    if ($val_domg->id_evaluacion == 1) {
-                        $resumen_gd_domingo[$det->gerencia][$val_domg->cedula]   = ($val_domg->asistencia != 0) ? $val_domg->asistencia : null;
-                    }
-                }
-            }else{
-                $resumen_gd_domingo[$det->gerencia][$det->cedula]   = null;
-            }
+            $resumen_domingo = RegistroCab::resumenFinSemana($det->cedula, $domingo,$mes);
+            $resumen_gd_domingo[$det->gerencia][$det->cedula] = ($domingo != 0) ? $domingo : null;
         }
 
         //CALCULO DE GUARDIAS TOTALES

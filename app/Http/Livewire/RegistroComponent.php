@@ -111,46 +111,15 @@ class RegistroComponent extends Component
                 }
 
                 $sabado = $fin_sem['sabado'];
-                $hist_regi_sabd = RegistroCab::resumenFinSemana($value->cedula, $sabado, null);
-
-                if (count($hist_regi_sabd) > 0) {
-                    foreach ($hist_regi_sabd as $key => $val_sab) {
-                        if ($val_sab->id_evaluacion == 1) {
-                            $this->resumen_gd_sabado[$val_sab->cedula]   = ($val_sab->asistencia != 0) ? $val_sab->asistencia : null;
-                        }
-                    }
-                }else{
-                    $this->resumen_gd_sabado[$value->cedula]   = null;
-                }
+                $resumen_gd_sabado = RegistroCab::resumenFinSemana($value->cedula, $sabado, null);
+                $this->resumen_gd_sabado[$value->cedula] = ($resumen_gd_sabado != 0) ? $resumen_gd_sabado : null;
 
                 $domingo = $fin_sem['domingo'];
-                $hist_regi_domg = RegistroCab::resumenFinSemana($value->cedula, $domingo, null);
+                $resumen_domingo = RegistroCab::resumenFinSemana($value->cedula, $domingo, null);
+                $this->resumen_gd_domingo[$value->cedula] = ($resumen_domingo != 0) ? $resumen_domingo : null;
 
-                if (count($hist_regi_domg) > 0) {
-                    foreach ($hist_regi_domg as $key => $val_domg) {
-                        if ($val_domg->id_evaluacion == 1) {
-                            $this->resumen_gd_domingo[$val_domg->cedula]   = ($val_domg->asistencia != 0) ? $val_domg->asistencia : null;
-                        }
-                    }
-                }else{
-                    $this->resumen_gd_domingo[$value->cedula]   = null;
-                }
+                $hist_regi = RegistroCab::historico(date("m"), $value->cedula);
                 
-                $hist_regi = DB::table('registros_subdet')
-                ->select(
-                    DB::raw('SUM(resultado) as asistencia,
-                    COUNT(IF(resultado = "F", 1, NULL)) "falta",
-                    COUNT(IF(resultado = "V", 1, NULL)) "vacacion",
-                    COUNT(IF(resultado = "R", 1, NULL)) "reposo",
-                    COUNT(IF(resultado = "P", 1, NULL)) "permiso"'),
-                    'id_evaluacion', 'registros_det.cedula')
-                ->join('registros_det', 'registros_subdet.id_reg_det', '=', 'registros_det.id_reg_det')
-                ->join('registros_cab', 'registros_det.id_registro', '=', 'registros_cab.id_registro')
-                ->whereMonth('fecha', date("m"))
-                ->where('cedula', $value->cedula)
-                ->groupBy('id_evaluacion', 'cedula')
-                ->get();
-
                 if (count($hist_regi) > 0) {
                     foreach ($hist_regi as $key => $value) {
                         if ($value->id_evaluacion == 1) {
@@ -182,6 +151,7 @@ class RegistroComponent extends Component
                 }
             }
             
+           // dd( $this->resumen_gd_sabado);
             //CALCULO DE GUARDIAS TOTALES
             foreach ($this->resumen_gd_totales as $key => $gd_total) {
                 $resultado = $this->resumen_gd_sabado[$key] + ($this->resumen_gd_domingo[$key]*2);

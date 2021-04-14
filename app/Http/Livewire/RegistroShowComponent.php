@@ -30,10 +30,7 @@ class RegistroShowComponent extends Component
         //Pageheader set true for breadcrumbs
         $pageConfigs = ['pageHeader' => true];
 
-        $dptos = Nmdpto::dpto();
-        foreach ($dptos as $key => $value) {
-            $this->dept[$value->DEP_CODIGO] =  $value->DEP_DESCRI;
-        }
+        $this->dept = Nmdpto::dptoArray();
 
         $data = $this->data;
         foreach ($data->registro_det as $key => $det) {

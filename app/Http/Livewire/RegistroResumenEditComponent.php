@@ -31,7 +31,6 @@ class RegistroResumenEditComponent extends Component
     
     public function render()
     {
-        
         $registro_cab = RegistroCab::with('registro_det')->find($this->id_registro);
 
         $fecha_max = RegistroCab::fechaMax($registro_cab->fecha);
@@ -43,21 +42,8 @@ class RegistroResumenEditComponent extends Component
         foreach ($registro_cab->registro_det as $key => $value) {
 
             $this->resumen_gd_totales[$value->cedula]   = null;
-        
-            $hist_regi = DB::table('registros_subdet')
-            ->select(
-                DB::raw('SUM(resultado) as asistencia,
-                COUNT(IF(resultado = "F", 1, NULL)) "falta",
-                COUNT(IF(resultado = "V", 1, NULL)) "vacacion",
-                COUNT(IF(resultado = "R", 1, NULL)) "reposo",
-                COUNT(IF(resultado = "P", 1, NULL)) "permiso"'),
-                'id_evaluacion', 'registros_det.cedula')
-            ->join('registros_det', 'registros_subdet.id_reg_det', '=', 'registros_det.id_reg_det')
-            ->join('registros_cab', 'registros_det.id_registro', '=', 'registros_cab.id_registro')
-            ->whereMonth('fecha', $mes)
-            ->where('cedula', $value->cedula)
-            ->groupBy('id_evaluacion', 'cedula')
-            ->get();
+            
+            $hist_regi = RegistroCab::historico($mes, $value->cedula);
 
             if (count($hist_regi) > 0) {
                 foreach ($hist_regi as $key => $value) {
@@ -103,30 +89,12 @@ class RegistroResumenEditComponent extends Component
             }
 
             $sabado = $fin_sem['sabado'];
-            $hist_regi_sabd = RegistroCab::resumenFinSemana($value->cedula, $sabado, $mes);
-
-            if (count($hist_regi_sabd) > 0) {
-                foreach ($hist_regi_sabd as $key => $val_sab) {
-                    if ($val_sab->id_evaluacion == 1) {
-                        $this->resumen_gd_sabado[$val_sab->cedula]   = ($val_sab->asistencia != 0) ? $val_sab->asistencia : null;
-                    }
-                }
-            }else{
-                $this->resumen_gd_sabado[$value->cedula]   = null;
-            }
+            $resumen_sabado = RegistroCab::resumenFinSemana($value->cedula, $sabado, $mes);
+            $this->resumen_gd_sabado[$value->cedula] = ($resumen_sabado != 0) ? $resumen_sabado : null;
 
             $domingo = $fin_sem['domingo'];
-            $hist_regi_domg = RegistroCab::resumenFinSemana($value->cedula, $domingo,$mes);
-
-            if (count($hist_regi_domg) > 0) {
-                foreach ($hist_regi_domg as $key => $val_domg) {
-                    if ($val_domg->id_evaluacion == 1) {
-                        $this->resumen_gd_domingo[$val_domg->cedula]   = ($val_domg->asistencia != 0) ? $val_domg->asistencia : null;
-                    }
-                }
-            }else{
-                $this->resumen_gd_domingo[$value->cedula]   = null;
-            }
+            $resumen_domingo = RegistroCab::resumenFinSemana($value->cedula, $domingo, $mes);
+            $this->resumen_gd_domingo[$value->cedula] = ($resumen_domingo != 0) ? $resumen_domingo : null;
         }
 
         //CALCULO DE GUARDIAS TOTALES

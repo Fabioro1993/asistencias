@@ -17,17 +17,27 @@ class Nmtrabajdor extends Model
 
     public function scopeUbic($query)
     {
-        //$ubc_agrense = DB::connection('mysql')->table('agren_dept as nmtrabajador')
-        $ubc_agrense = DB::connection('agrense')->table('nmtrabajador')
+        //Casa
+        $ubc_agrense = DB::connection('mysql')->table('agren_trabajador as nmtrabajador')
+            ->selectRaw('"agrense" as empresa, nmtrabajador.UBICACION')
+            ->whereNotNull('nmtrabajador.UBICACION')
+            ->groupby('nmtrabajador.UBICACION')->get();
+        
+        $ubc_oso = DB::connection('mysql')->table('oso_trabajador as nmtrabajador')
+                    ->selectRaw('"oso" as empresa, nmtrabajador.UBICACION')
+                    ->whereNotNull('nmtrabajador.UBICACION')
+                    ->groupby('nmtrabajador.UBICACION')->get();
+        
+        //Oficina
+        /*$ubc_agrense = DB::connection('agrense')->table('nmtrabajador')
                 ->selectRaw('"agrense" as empresa, nmagren.nmtrabajador.UBICACION')
                 ->whereNotNull('nmagren.nmtrabajador.UBICACION')
                 ->groupby('nmagren.nmtrabajador.UBICACION')->get();
         
-        //$ubc_oso = DB::connection('mysql')->table('oso_dept as nmtrabajador')
         $ubc_oso = DB::connection('oso')->table('nmtrabajador')
                 ->selectRaw('"oso" as empresa, nmoso.nmtrabajador.UBICACION')
                 ->whereNotNull('nmoso.nmtrabajador.UBICACION')
-                ->groupby('nmoso.nmtrabajador.UBICACION')->get();
+                ->groupby('nmoso.nmtrabajador.UBICACION')->get();*/
 
         $result = $ubc_agrense->merge($ubc_oso);
 
