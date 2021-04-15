@@ -7,7 +7,7 @@
       "class": "waves-effect waves-cyan",
       "icon": "bookmark_border",
       "slug": "inicio",
-      "acceso": ["1", "3"]
+      "acceso": ["1", "2", "3"]
     },
     {
       "url": "javascript:void(0)",

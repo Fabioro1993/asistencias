@@ -89,7 +89,7 @@
                                             wire:keyup="evaluacion({{$p_oso->cedula}}, '{{$evaluaciones[$i]->id_evaluacion}}')">
                                             @if ($error[$p_oso->cedula][$evaluaciones[$i]->id_evaluacion] == 1)
                                                 <small class="errorTxt1">
-                                                    <div class="error">El valor debe ser menor a 2</div>
+                                                    <div class="error">El valor debe ser menor a {{$evaluaciones[$i]->max}}</div>
                                                 </small>
                                             @endif
                                         </td> 

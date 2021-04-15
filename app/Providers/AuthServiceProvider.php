@@ -35,16 +35,16 @@ class AuthServiceProvider extends ServiceProvider
         $this->registerPolicies();
 
         //Casa
-        Fortify::authenticateUsing(function ($request) {
+        /*Fortify::authenticateUsing(function ($request) {
             $user = User::where('username', $request->username)->first();
             
             if ($user) {
                 return $user;
             }
-        });
+        });*/
 
         //LDAP
-        /*Fortify::authenticateUsing(function ($request) {
+        Fortify::authenticateUsing(function ($request) {
 
             $usuario = User::where('username', $request->username)->first();
             
@@ -59,6 +59,6 @@ class AuthServiceProvider extends ServiceProvider
             }
             
             return $validated ? Auth::getLastAttempted() : null;
-        });*/
+        });
     }
 }

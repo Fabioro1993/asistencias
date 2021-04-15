@@ -43,15 +43,15 @@ class RegistroCab extends Model
     public function scopeTrabajador($query)
     {
         //agren_trabajador
-        $emp_agrense = DB::connection('mysql')->table('agren_trabajador as nmtrabajador')
-        //$emp_agrense = DB::connection('agrense')->table('nmtrabajador')
+        //$emp_agrense = DB::connection('mysql')->table('agren_trabajador as nmtrabajador')
+        $emp_agrense = DB::connection('agrense')->table('nmtrabajador')
                 ->selectRaw('"agrense" as empresa, nmtrabajador.CODIGO as cedula, CONCAT(nmtrabajador.NOMBRE, " ", nmtrabajador.APELLIDO) As nombre, nmtrabajador.COD_DPTO as depto, nmtrabajador.UBICACION as ubicacion, nmdpto.DEP_DESCRI as descr, CONCAT("agrense", "_", nmtrabajador.COD_DPTO,"_", nmtrabajador.UBICACION) As emp_dep')
                 ->join('nmdpto', 'nmtrabajador.COD_DPTO', '=', 'nmdpto.DEP_CODIGO')
                 ->where('nmtrabajador.CONDICION', '=', 'A')
                 ->whereNotNull('nmtrabajador.UBICACION')->get();
         
-        $emp_oso = DB::connection('mysql')->table('oso_trabajador as nmtrabajador')
-        //$emp_oso = DB::connection('oso')->table('nmtrabajador')
+        //$emp_oso = DB::connection('mysql')->table('oso_trabajador as nmtrabajador')
+        $emp_oso = DB::connection('oso')->table('nmtrabajador')
                 ->selectRaw('"oso" as empresa, nmtrabajador.CODIGO as cedula, CONCAT(nmtrabajador.NOMBRE, " ", nmtrabajador.APELLIDO) As nombre, nmtrabajador.COD_DPTO as depto, nmtrabajador.UBICACION as ubicacion, nmdpto.DEP_DESCRI as descr, CONCAT("oso", "_", nmtrabajador.COD_DPTO,"_", nmtrabajador.UBICACION) As emp_dep')
                 ->join('nmdpto', 'nmtrabajador.COD_DPTO', '=', 'nmdpto.DEP_CODIGO')
                 ->where('nmtrabajador.CONDICION','=' ,'A')
@@ -72,8 +72,7 @@ class RegistroCab extends Model
         // WHERE nmagren.nmtrabajador.CONDICION = "A" AND nmagren.nmtrabajador.UBICACION IS NOT NULL
 
     }
-
-
+    
     public function scopeHistorico($query, $mes, $cedula)
     {
         $hist_regi = DB::table('registros_subdet')
@@ -373,7 +372,7 @@ class RegistroCab extends Model
 
             $domingo = $fin_sem['domingo'];
             $resumen_domingo = RegistroCab::resumenFinSemana($det->cedula, $domingo,$mes);
-            $resumen_gd_domingo[$det->gerencia][$det->cedula] = ($domingo != 0) ? $domingo : null;
+            $resumen_gd_domingo[$det->gerencia][$det->cedula] = ($resumen_domingo != 0) ? $resumen_domingo : null;
         }
 
         //CALCULO DE GUARDIAS TOTALES

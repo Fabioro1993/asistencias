@@ -69,7 +69,7 @@ class NominaResumenComponent extends Component
     {
         $resumen = RegistroCab::resumenNomina($id);
 
-        $dptos = Nmdpto::dptoArray();
+        $dept = Nmdpto::dptoArray();
         
         if (date("d", strtotime($resumen['fecha_max'])) <= '15') {
             $quincena = $this->meses[date("n", strtotime($resumen['fecha_max']))].' I';
@@ -77,6 +77,7 @@ class NominaResumenComponent extends Component
             $quincena = $this->meses[date("n", strtotime($resumen['fecha_max']))].' II';
         }
         
+        //dd($dptos);
         $pdf = PDF::loadView('livewire.nomina.nominapdf', compact('resumen', 'dept', 'quincena'))->setPaper('a4', 'landscape');;
         return $pdf->stream(''.$quincena.'.pdf');
     }

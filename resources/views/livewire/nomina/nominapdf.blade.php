@@ -155,6 +155,8 @@
                             <th>Nombre y<br>Apellido</th>
                             <th>Dias<br>Asistidos</th>
                             <th>Faltas No<br>Justificadas</th>
+                            <th>Permisos</th>
+                            <th>Reposos</th>
                             <th>Dias de<br>Vacacion</th>
                             <th>Horas Extras<br>Diurna</th>
                             <th>Horas Extras<br>Nocturno</th>
@@ -175,6 +177,8 @@
                             <td>{{$nombre}}</td>
                             <td style="text-align: center">{{$resumen['resumen_asistencia'][$gerencia][$cedula]}}</td>
                             <td style="text-align: center">{{$resumen['resumen_faltajust'][$gerencia][$cedula]}}</td>
+                            <td style="text-align: center">{{$resumen['resumen_permiso'][$gerencia][$cedula]}}</td>
+                            <td style="text-align: center">{{$resumen['resumen_reposo'][$gerencia][$cedula]}}</td>
                             <td style="text-align: center">{{$resumen['resumen_vacacion'][$gerencia][$cedula]}}</td>
                             <td style="text-align: center">{{$resumen['resumen_hx_diurna'][$gerencia][$cedula]}}</td>
                             <td style="text-align: center">{{$resumen['resumen_hx_nocturna'][$gerencia][$cedula]}}</td>

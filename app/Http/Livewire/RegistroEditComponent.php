@@ -256,6 +256,8 @@ class RegistroEditComponent extends Component
     {
         $this->recargar = 1;
 
+        $maximo = Evaluacion::find($id_evaluacion)->max;
+
         $reg_is = RegistroCab::with(["registro_det" => function($a) use ($cedula, $id_evaluacion){
             $a->where('cedula', '=', $cedula)
                 ->with(["registro_sub" => function($q) use ($id_evaluacion){
@@ -264,8 +266,8 @@ class RegistroEditComponent extends Component
             }])->find($this->id_reg);
         
         if (is_numeric($this->evaluacion[$cedula][$id_evaluacion]) || $this->evaluacion[$cedula][$id_evaluacion] == "") {
-
-            if ($this->evaluacion[$cedula][$id_evaluacion] > 2) {
+            
+            if ($this->evaluacion[$cedula][$id_evaluacion] > $maximo) {
                 
                 $this->error[$cedula][$id_evaluacion] = 1;
             }else{
@@ -275,40 +277,50 @@ class RegistroEditComponent extends Component
                 }else{
                     $valor = $this->evaluacion[$cedula][$id_evaluacion];
                 }
-
+                
                 if ($id_evaluacion == '2') {
                     //Elimino
-                    $this->resumen_edit['resumen_hx_diurna'][$cedula] = $this->resumen_edit['resumen_hx_diurna'][$cedula] - $reg_is->registro_det[0]->registro_sub[0]->resultado;
-
+                    if (count($reg_is->registro_det) > 0) {
+                        $this->resumen_edit['resumen_hx_diurna'][$cedula] = $this->resumen_edit['resumen_hx_diurna'][$cedula] - $reg_is->registro_det[0]->registro_sub[0]->resultado;
+                    }
+                    
                     //Sumo
                     $this->resumen_edit['resumen_hx_diurna'][$cedula] = $this->resumen_edit['resumen_hx_diurna'][$cedula] + $valor;
 
-                    if ($reg_is->registro_det[0]->registro_sub[0]->resultado == 0) {
-                        $this->resumen_edit['resumen_hx_diurna'][$cedula] = ($valor != 0) ? $valor : null;
+                    if (count($reg_is->registro_det) > 0) {
+                        if ($reg_is->registro_det[0]->registro_sub[0]->resultado == 0) {
+                            $this->resumen_edit['resumen_hx_diurna'][$cedula] = ($valor != 0) ? $valor : null;
+                        }
                     }
                 }
                 if ($id_evaluacion == '3') {
                     //Elimino
-                    $this->resumen_edit['resumen_hx_nocturna'][$cedula] = $this->resumen_edit['resumen_hx_nocturna'][$cedula] - $reg_is->registro_det[0]->registro_sub[0]->resultado;
-
+                    if (count($reg_is->registro_det) > 0) {
+                        $this->resumen_edit['resumen_hx_nocturna'][$cedula] = $this->resumen_edit['resumen_hx_nocturna'][$cedula] - $reg_is->registro_det[0]->registro_sub[0]->resultado;
+                    }
                     //Sumo
                     $this->resumen_edit['resumen_hx_nocturna'][$cedula] = $this->resumen_edit['resumen_hx_nocturna'][$cedula] + $valor;
 
-                    if ($reg_is->registro_det[0]->registro_sub[0]->resultado == 0) {
-                        $this->resumen_edit['resumen_hx_nocturna'][$cedula] = ($valor != 0) ? $valor : null;
+                    if (count($reg_is->registro_det) > 0) {
+                        if ($reg_is->registro_det[0]->registro_sub[0]->resultado == 0) {
+                            $this->resumen_edit['resumen_hx_nocturna'][$cedula] = ($valor != 0) ? $valor : null;
+                        }
                     }
-
                 }
                 if ($id_evaluacion == '4') {
                     //Elimino
-                    $this->resumen_edit['bono_nocturno'][$cedula] = $this->resumen_edit['bono_nocturno'][$cedula] - $reg_is->registro_det[0]->registro_sub[0]->resultado;
+                    if (count($reg_is->registro_det) > 0) {
+                        $this->resumen_edit['bono_nocturno'][$cedula] = $this->resumen_edit['bono_nocturno'][$cedula] - $reg_is->registro_det[0]->registro_sub[0]->resultado;
+                    }                    
 
                     //Sumo
                     $this->resumen_edit['bono_nocturno'][$cedula] = $this->resumen_edit['bono_nocturno'][$cedula] + $valor;
 
-                    if ($reg_is->registro_det[0]->registro_sub[0]->resultado == 0) {
-                        $this->resumen_edit['bono_nocturno'][$cedula] = ($valor != 0) ? $valor : null;
-                    }
+                    if (count($reg_is->registro_det) > 0) {
+                        if ($reg_is->registro_det[0]->registro_sub[0]->resultado == 0) {
+                            $this->resumen_edit['bono_nocturno'][$cedula] = ($valor != 0) ? $valor : null;
+                        }
+                    }                    
                 }
                 $this->error[$cedula][$id_evaluacion] = 0;
             }

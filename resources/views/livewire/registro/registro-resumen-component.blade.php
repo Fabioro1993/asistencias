@@ -11,6 +11,8 @@
                  <th data-field="status" class="center">Dias Asistidos</th>
                  <th data-field="status" class="center">Faltas No Justificadas</th>
                  <th data-field="status" class="center">Dias de Vacacion</th>
+                 <th data-field="status" class="center">Permisos</th>
+                 <th data-field="status" class="center">Reposos</th>
                  <th data-field="status" class="center">Horas Extras Diurna</th>
                  <th data-field="status" class="center">Horas Extras Nocturno</th>
                  <th data-field="status" class="center">Bono Nocturno</th>
@@ -28,6 +30,8 @@
                <td class="center">{{$resumen_asistencia[$det->cedula]}}</td>
                <td class="center">{{$resumen_faltajust[$det->cedula]}}</td>
                <td class="center">{{$resumen_vacacion[$det->cedula]}}</td>
+               <td class="center">{{$resumen_permiso[$det->cedula]}}</td>
+               <td class="center">{{$resumen_reposo[$det->cedula]}}</td>
                <td class="center">{{$resumen_hx_diurna[$det->cedula]}}</td>
                <td class="center">{{$resumen_hx_nocturna[$det->cedula]}}</td>
                <td class="center">{{$bono_nocturno[$det->cedula]}}</td>

@@ -300,12 +300,14 @@ class RegistroComponent extends Component
     public function evaluacion($cedula, $id_evaluacion)
     {
         $this->comparar = $this->cant_trabaj;
+
+        $maximo = Evaluacion::find($id_evaluacion)->max;
         
         if (isset($this->evaluacion[$cedula][$id_evaluacion])
             && 
                 (is_numeric($this->evaluacion[$cedula][$id_evaluacion]) || $this->evaluacion[$cedula][$id_evaluacion] == "")) {
             
-            if ($this->evaluacion[$cedula][$id_evaluacion] > 2) {
+            if ($this->evaluacion[$cedula][$id_evaluacion] > $maximo) {
                 
                 $this->error[$cedula][$id_evaluacion] = 1;
             }else{

@@ -42,17 +42,17 @@ class Nmdpto extends Model
     public function scopeDptoArray($query)
     {
         //Casa
-        $dptos = DB::connection('mysql')->table('nmdpto')
-                    ->selectRaw('"oso" as empresa, nmdpto.DEP_CODIGO, nmdpto.DEP_DESCRI')->get();
+        /*$dptos = DB::connection('mysql')->table('nmdpto')
+                    ->selectRaw('"oso" as empresa, nmdpto.DEP_CODIGO, nmdpto.DEP_DESCRI')->get();*/
         
         //Oficina           
-        /*$dept_agrense = DB::connection('agrense')->table('nmdpto')
+        $dept_agrense = DB::connection('agrense')->table('nmdpto')
                 ->selectRaw('"agrense" as empresa, nmagren.nmdpto.DEP_CODIGO, nmagren.nmdpto.DEP_DESCRI')->get();
         
         $dept_oso = DB::connection('oso')->table('nmdpto')
                 ->selectRaw('"oso" as empresa, nmoso.nmdpto.DEP_CODIGO, nmoso.nmdpto.DEP_DESCRI')->get();
 
-        $dptos = $dept_agrense->merge($dept_oso);*/
+        $dptos = $dept_agrense->merge($dept_oso);
 
         foreach ($dptos as $key => $value) {
             $dept_array[$value->DEP_CODIGO] =  $value->DEP_DESCRI;

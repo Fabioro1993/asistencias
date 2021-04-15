@@ -32,6 +32,8 @@
                                                 <th class="center">Nombre y Apellido</th>
                                                 <th class="center">Dias Asistidos</th>
                                                 <th class="center">Faltas No Justificadas</th>
+                                                <th class="center">Permisos</th>
+                                                <th class="center">Reposos</th>
                                                 <th class="center">Dias de Vacacion</th>
                                                 <th class="center">Horas Extras Diurna</th>
                                                 <th class="center">Horas Extras Nocturno</th>
@@ -53,6 +55,8 @@
                                                 <td class="center">{{$resumen['resumen_asistencia'][$gerencia][$cedula]}}</td>
                                                 <td class="center">{{$resumen['resumen_faltajust'][$gerencia][$cedula]}}</td>
                                                 <td class="center">{{$resumen['resumen_vacacion'][$gerencia][$cedula]}}</td>
+                                                <td class="center">{{$resumen['resumen_permiso'][$gerencia][$cedula]}}</td>
+                                                <td class="center">{{$resumen['resumen_reposo'][$gerencia][$cedula]}}</td>
                                                 <td class="center">{{$resumen['resumen_hx_diurna'][$gerencia][$cedula]}}</td>
                                                 <td class="center">{{$resumen['resumen_hx_nocturna'][$gerencia][$cedula]}}</td>
                                                 <td class="center">{{$resumen['bono_nocturno'][$gerencia][$cedula]}}</td>
