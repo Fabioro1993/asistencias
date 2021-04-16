@@ -79,8 +79,14 @@ class RegistroComponent extends Component
         if (!isset($this->comparar)) {
             
             //CALCULO DE FECHA DE REGISTRO SELECT-MIN-MAX
-            $registro_abierto = RegistroCab::orderBy('fecha','desc')->where('id_estado', 3)->get()->take(1);
-            $registro = RegistroCab::orderBy('fecha','desc')->get()->take(1);
+            //SE BUSCAN LOS REGISTROS DE ESE USUARIO PARA SEPARAR POR GERENCIA
+            $registro_abierto = RegistroCab::orderBy('fecha','desc')
+                                ->where('id', Auth::user()->id)
+                                ->where('id_estado', 3)->get()->take(1);
+
+            $registro = RegistroCab::orderBy('fecha','desc')
+                                ->where('id', Auth::user()->id)
+                                ->get()->take(1);
 
             if (count($registro_abierto)>0) {
                 $registro = $registro_abierto;
@@ -151,7 +157,6 @@ class RegistroComponent extends Component
                 }
             }
             
-           // dd( $this->resumen_gd_sabado);
             //CALCULO DE GUARDIAS TOTALES
             foreach ($this->resumen_gd_totales as $key => $gd_total) {
                 $resultado = $this->resumen_gd_sabado[$key] + ($this->resumen_gd_domingo[$key]*2);
