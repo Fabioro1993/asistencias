@@ -54,9 +54,9 @@
                                                 <td style="font-size: 11px;">{{$nombre}}</td>
                                                 <td class="center">{{$resumen['resumen_asistencia'][$gerencia][$cedula]}}</td>
                                                 <td class="center">{{$resumen['resumen_faltajust'][$gerencia][$cedula]}}</td>
-                                                <td class="center">{{$resumen['resumen_vacacion'][$gerencia][$cedula]}}</td>
                                                 <td class="center">{{$resumen['resumen_permiso'][$gerencia][$cedula]}}</td>
                                                 <td class="center">{{$resumen['resumen_reposo'][$gerencia][$cedula]}}</td>
+                                                <td class="center">{{$resumen['resumen_vacacion'][$gerencia][$cedula]}}</td>
                                                 <td class="center">{{$resumen['resumen_hx_diurna'][$gerencia][$cedula]}}</td>
                                                 <td class="center">{{$resumen['resumen_hx_nocturna'][$gerencia][$cedula]}}</td>
                                                 <td class="center">{{$resumen['bono_nocturno'][$gerencia][$cedula]}}</td>
