@@ -15,7 +15,7 @@ class RegistroDet extends Model
 
     protected $dates = ['deleted_at'];
 
-    protected $fillable = ['id_registro', 'cedula', 'nombre', 'comentario', 'empresa', 'gerencia', 'ubicacion'];
+    protected $fillable = ['id_registro', 'cedula', 'nombre', 'comentario', 'empresa', 'gerencia', 'ubicacion', 'id_user'];
 
     protected $primaryKey = 'id_reg_det';
 

@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Auth;
 
 class RegistroEditComponent extends Component
 {
-    public $data, $observacion, $select_val, $id_reg, $cedula_reg, $eval_reg, $asistencia, $resumen_edit, $fin_semana, $adicionales, $input_sel, $ubi_reg;
+    public $data, $observacion, $select_val, $id_reg, $cedula_reg, $eval_reg, $asistencia, $resumen_edit, $fin_semana, $adicionales, $input_sel, $ubi_reg, $fecha;
     public $hidden = 'hidden';
     public $recargar = 0;
     public $dept; 
@@ -33,6 +33,7 @@ class RegistroEditComponent extends Component
     {
         $this->id_reg  = $id;
         $this->data    = RegistroCab::with('registro_det.registro_sub.evalua')->find($id);
+        $this->fecha   = RegistroCab::find($id)->fecha;
         $evaluaciones  = Evaluacion::whereIn('id_evaluacion', [1, 2, 3,4])->get();
         
         foreach ($this->data->registro_det as $key => $value) {
@@ -410,11 +411,12 @@ class RegistroEditComponent extends Component
 
                 if ($id_cab == 'new') {
                     $registro_cab  = new RegistroCab();
+                    $registro_cab->fecha   = $this->fecha;
+                    $registro_cab->id           = Auth::user()->id;
                 }else{
                     $registro_cab = RegistroCab::with('registro_det.registro_sub')->find($id_cab);
                 }
                 
-                $registro_cab->id           = Auth::user()->id;
                 $registro_cab->observacion  = $this->observacion;
                 $registro_cab->id_estado    = $estado;
                 $registro_cab->save();
@@ -433,9 +435,10 @@ class RegistroEditComponent extends Component
                         }
                     }
                     
-                    $registro_det->id_registro   = $id_cab;
+                    $registro_det->id_registro   = $registro_cab->id_registro;
                     $registro_det->cedula        = $cedula;
                     $registro_det->nombre        = $nombre;
+                    $registro_det->id_user       = Auth::user()->id;
                     $registro_det->comentario    = $this->comentario[$cedula];
                     $registro_det->empresa       = $this->empr_trabaj[$cedula][0];
                     $registro_det->gerencia      = $this->empr_trabaj[$cedula][1];
@@ -445,7 +448,7 @@ class RegistroEditComponent extends Component
                     foreach ($evaluacion[$cedula] as $id_eval => $resul) {
 
                         if ($id_cab == 'new') {
-                            $registro_sub   = new RegistroSubdet();
+                            $registro_sub        = new RegistroSubdet();
                         }else{
     
                             $sub = RegistroSubdet::where('id_registro',$id_cab)->where('id_reg_det',$registro_det->id_reg_det)
@@ -458,7 +461,7 @@ class RegistroEditComponent extends Component
                             }
                         }
                         
-                        $registro_sub->id_registro      = $id_cab;
+                        $registro_sub->id_registro      = $registro_cab->id_registro;
                         $registro_sub->id_reg_det       = $registro_det->id_reg_det;
                         $registro_sub->id_evaluacion    = $id_eval;
                         $registro_sub->resultado        = ($resul == null) ? 0 : $resul;

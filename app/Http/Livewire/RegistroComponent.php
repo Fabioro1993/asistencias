@@ -385,6 +385,7 @@ class RegistroComponent extends Component
             foreach ($this->cant_trabaj as $cedula => $value) {
                 
                 $registro_det                = new RegistroDet();
+                $registro_det->id_user       = Auth::user()->id;
                 $registro_det->id_registro   = $registro_cab->id_registro;
                 $registro_det->cedula        = $cedula;
                 $registro_det->nombre        = $value;

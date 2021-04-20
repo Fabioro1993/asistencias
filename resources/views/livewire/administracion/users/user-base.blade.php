@@ -34,38 +34,3 @@
         <!-- </div> -->
     </div>
 </div>
-
-@push('script')
-<script>
-    window.addEventListener('contentChanged', event => {
-
-        // $('ul.tabs').tabs();
-        // var el = document.querySelector('.tabs');
-        // //console.log(el);
-        // var instance = M.Tabs.init(el);
-
-        //$('.tabs').tabs('select_tab', 'information');
-        //alert('a');
-        // var elems = document.querySelectorAll('.tabs');
-        // var instances = M.Tabs.init(elems);
-        // instance.select('#registro');
-
-        
-
-        // console.log(instances);
-        // $('ul.tab').tabs('select_tab', 'information');
-        // var elems = document.querySelectorAll('tabs');
-        // var instance = M.Tabs.init(elems,{
-        //     duration: 5000
-            
-        // });
-
-        // alert('a');
-        
-        
-
-        // $('.tabs').tabs();
-        // var instance = M.Tabs.init(el); 
-    });
-</script>
-@endpush

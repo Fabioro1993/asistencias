@@ -22,6 +22,7 @@ class CreateRegistrosDetTable extends Migration
             $table->string('gerencia');
             $table->string('ubicacion');
             $table->string('comentario')->nullable();
+            $table->foreignId('id_user')->references('id')->on('users');
             $table->timestamps();
             $table->softDeletes();
         });

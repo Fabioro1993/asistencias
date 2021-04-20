@@ -99,7 +99,7 @@ class RegistroCab extends Model
         $mes = date("m", strtotime($fecha_prop));
         $dia = date("d", strtotime($fecha_prop));
 
-        $fecha_max = ($fecha_prop < date("Y-m-15", strtotime(date($anio.'-'.$mes.'-'.$dia)))) ?   
+        $fecha_max = ($fecha_prop <= date("Y-m-15", strtotime(date($anio.'-'.$mes.'-'.$dia)))) ?   
         date("Y-m-15", strtotime(date($anio.'-'.$mes.'-'.$dia))) : //SI
         date("Y-m-t", strtotime(date($anio.'-'.$mes.'-'.$dia))); //NO
 
