@@ -18,17 +18,17 @@ class Nmdpto extends Model
     public function scopeDpto($query)
     {
         //Casa
-        $result = DB::connection('mysql')->table('nmdpto')
-                    ->selectRaw('"oso" as empresa, nmdpto.DEP_CODIGO, nmdpto.DEP_DESCRI')->get();  
+        /*$result = DB::connection('mysql')->table('nmdpto')
+                    ->selectRaw('"oso" as empresa, nmdpto.DEP_CODIGO, nmdpto.DEP_DESCRI')->get();  */
                     
         //Oficina           
-        /*$dept_agrense = DB::connection('agrense')->table('nmdpto')
+        $dept_agrense = DB::connection('agrense')->table('nmdpto')
                 ->selectRaw('"agrense" as empresa, nmagren.nmdpto.DEP_CODIGO, nmagren.nmdpto.DEP_DESCRI')->get();
         
         $dept_oso = DB::connection('oso')->table('nmdpto')
                 ->selectRaw('"oso" as empresa, nmoso.nmdpto.DEP_CODIGO, nmoso.nmdpto.DEP_DESCRI')->get();
 
-        $result = $dept_agrense->merge($dept_oso);*/
+        $result = $dept_agrense->merge($dept_oso);
 
         return $result;
         
