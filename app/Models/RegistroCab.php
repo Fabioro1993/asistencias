@@ -24,12 +24,10 @@ class RegistroCab extends Model
     {
         return $this->belongsTo(User::class, 'id');
     }
-
     public function estado()
     {
         return $this->belongsTo(Estado::class, 'id_estado');
     }
-
     public function registro_det()
     {
         return $this->hasMany(RegistroDet::class, 'id_registro');
@@ -248,14 +246,8 @@ class RegistroCab extends Model
             $domingo = $fin_sem['domingo'];
             $resumen_domingo = RegistroCab::resumenFinSemana($value->cedula, $domingo, $mes);
             $resumen_gd_domingo[$value->cedula] = ($resumen_domingo != 0) ? $resumen_domingo : null;
-
         }
-
-        //CALCULO DE GUARDIAS TOTALES
-        foreach ($resumen_gd_totales as $key => $gd_total) {
-            $resultado = $resumen_gd_sabado[$key] + ($resumen_gd_domingo[$key]*2);
-            $resumen_gd_totales[$key]   = ($resultado == 0) ? null : $resultado;
-        }
+        
         
         $nmtrabajador = RegistroCab::trabajador()->whereIn('emp_dep', $ubi);
         
@@ -266,21 +258,95 @@ class RegistroCab extends Model
         $resultado = array_diff($cedulas_nmtrab, $cedula_reg);
 
         if (count($resultado) >= 1) {
-                
+            
             foreach ($resultado as $key_resl => $val_resl) {
-                $resumen_gd_totales[$val_resl] = null;
-                $resumen_asistencia[$val_resl] = null;
-                $resumen_faltajust[$val_resl] = null;
-                $resumen_vacacion[$val_resl] = null;
-                $resumen_hx_diurna[$val_resl] = null;
-                $resumen_hx_nocturna[$val_resl] = null;
-                $bono_nocturno[$val_resl] = null;
-                $adicionales[$val_resl] =  null;          
-                $resumen_gd_sabado[$val_resl] = null;               
-                $resumen_gd_domingo[$val_resl] = null;
-                $resumen_reposo[$val_resl] = null;
-                $resumen_permiso[$val_resl] = null;
+
+                $new = RegistroCab::where('fecha', $registro_cab->fecha)
+                            ->whereHas('registro_det', function($q) use ($val_resl){
+                                $q->where('cedula', $val_resl);
+                            })->with(['registro_det.registro_sub', 'registro_det'=>function ($a) use ($val_resl){
+                                $a->where('cedula', $val_resl);
+                            }])
+                            ->get();
+                
+                if (count($new) == 0) {
+                    $resumen_gd_totales[$val_resl] = null;
+                    $resumen_asistencia[$val_resl] = null;
+                    $resumen_faltajust[$val_resl] = null;
+                    $resumen_vacacion[$val_resl] = null;
+                    $resumen_hx_diurna[$val_resl] = null;
+                    $resumen_hx_nocturna[$val_resl] = null;
+                    $bono_nocturno[$val_resl] = null;
+                    $adicionales[$val_resl] =  null;          
+                    $resumen_gd_sabado[$val_resl] = null;               
+                    $resumen_gd_domingo[$val_resl] = null;
+                    $resumen_reposo[$val_resl] = null;
+                    $resumen_permiso[$val_resl] = null;
+                }else{
+                    $registros_det = $new[0]->registro_det[0];
+
+                    $resumen_gd_totales[$registros_det->cedula]   = null;
+            
+                    $hist_regi = RegistroCab::historico($mes, $registros_det->cedula);
+                    
+                    if (count($hist_regi) > 0) {
+                        foreach ($hist_regi as $key => $val_ht) {
+                            if ($val_ht->id_evaluacion == 1) {
+                                $resumen_asistencia[$val_ht->cedula]   = ($val_ht->asistencia != 0) ? $val_ht->asistencia : null;
+                                $resumen_faltajust[$val_ht->cedula]    = ($val_ht->falta != 0) ? $val_ht->falta : null;
+                                $resumen_vacacion[$val_ht->cedula]     = ($val_ht->vacacion != 0) ? $val_ht->vacacion : null;
+                                $resumen_reposo[$val_ht->cedula]       = ($val_ht->reposo != 0) ? $val_ht->reposo : null;
+                                $resumen_permiso[$val_ht->cedula]      = ($val_ht->permiso != 0) ? $val_ht->permiso : null;
+                            }
+                            if ($val_ht->id_evaluacion == 2) {
+                                $resumen_hx_diurna[$val_ht->cedula]    = ($val_ht->asistencia != 0) ? $val_ht->asistencia : null;
+                            }
+                            if ($val_ht->id_evaluacion == 3) {
+                                $resumen_hx_nocturna[$val_ht->cedula]  = ($val_ht->asistencia != 0) ? $val_ht->asistencia : null;
+                            }
+                            if ($val_ht->id_evaluacion == 4) {
+                                $bono_nocturno[$val_ht->cedula]        = ($val_ht->asistencia != 0) ? $val_ht->asistencia : null;
+                            }
+                        }
+                    }else{
+                        $resumen_asistencia[$registros_det->cedula]   = null; 
+                        $resumen_hx_diurna[$registros_det->cedula]    = null; 
+                        $resumen_hx_nocturna[$registros_det->cedula]  = null; 
+                        $bono_nocturno[$registros_det->cedula]        = null;
+                        $resumen_faltajust[$registros_det->cedula]    = null;
+                        $resumen_vacacion[$registros_det->cedula]     = null;
+                        $resumen_reposo[$registros_det->cedula]       = null;
+                        $resumen_permiso[$registros_det->cedula]      = null;
+                        $adicionales[$registros_det->cedula]          = null;
+                    }
+
+                    $hist_gd_adicional = RegistroCab::guardiaAdional($registros_det->cedula, $mes);
+                    
+                    if (count($hist_gd_adicional) > 0) {
+                        foreach ($hist_gd_adicional as $key => $val_adic) {
+                            if ($val_adic->id_evaluacion == 11) {
+                                $adicionales[$value->cedula]  = ($val_adic->asistencia != 0) ? $val_adic->asistencia : null;
+                            }
+                        }
+                    }else{
+                        $adicionales[$registros_det->cedula]   = null;
+                    }
+
+                    $sabado = $fin_sem['sabado'];
+                    $resumen_sabado = RegistroCab::resumenFinSemana($registros_det->cedula, $sabado, $mes);
+                    $resumen_gd_sabado[$registros_det->cedula] = ($resumen_sabado != 0) ? $resumen_sabado : null;
+                    
+                    $domingo = $fin_sem['domingo'];
+                    $resumen_domingo = RegistroCab::resumenFinSemana($registros_det->cedula, $domingo, $mes);
+                    $resumen_gd_domingo[$registros_det->cedula] = ($resumen_domingo != 0) ? $resumen_domingo : null;
+                }
             }
+        }
+
+        //CALCULO DE GUARDIAS TOTALES
+        foreach ($resumen_gd_totales as $key => $gd_total) {
+            $resultado = $resumen_gd_sabado[$key] + ($resumen_gd_domingo[$key]*2);
+            $resumen_gd_totales[$key]   = ($resultado == 0) ? null : $resultado;
         }
 
         $data['resumen_gd_totales'] = $resumen_gd_totales;

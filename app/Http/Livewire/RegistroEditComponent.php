@@ -15,12 +15,13 @@ use Illuminate\Support\Facades\Auth;
 
 class RegistroEditComponent extends Component
 {
-    public $data, $observacion, $select_val, $id_reg, $cedula_reg, $eval_reg, $asistencia, $resumen_edit, $fin_semana, $adicionales, $input_sel;
+    public $data, $observacion, $select_val, $id_reg, $cedula_reg, $eval_reg, $asistencia, $resumen_edit, $fin_semana, $adicionales, $input_sel, $ubi_reg;
     public $hidden = 'hidden';
     public $recargar = 0;
     public $dept; 
     public $error = array();
 
+    public $cab_reg = array();
     public $comentario = array();
     public $evaluacion = array();
     public $adicionales_input = array();
@@ -35,12 +36,15 @@ class RegistroEditComponent extends Component
         $evaluaciones  = Evaluacion::whereIn('id_evaluacion', [1, 2, 3,4])->get();
         
         foreach ($this->data->registro_det as $key => $value) {
-            
             $this->cedula_reg[] = $value->cedula;
+            $this->ubi_reg[]    = $value->empresa.'_'.$value->gerencia.'_'.$value->ubicacion;
+
             foreach ($evaluaciones as $key => $evaluacion) {
                 $this->asistencia_input[$value->cedula][$evaluacion->id_evaluacion] = null;
             }
         }
+
+        $this->ubi_reg = array_unique($this->ubi_reg);
 
         foreach ($this->data->registro_det[0]->registro_sub as $key => $value) {
             $this->eval_reg[] = $value->cedula;
@@ -84,29 +88,32 @@ class RegistroEditComponent extends Component
             $ubi[] = $value->empresa.'_'.$value->gerencia.'_'.$value->ubicacion;
         }
         
-        $nmtrabajador = RegistroCab::trabajador()->whereIn('emp_dep', $ubi);
-
+        //AGRUPO LAS GERENCIAS DEL USUARIO QUE EDITA CON LAS DEL REGISTRO CARGADO POR PRIMERA VEZ
+        $ubic = array_unique(array_merge($this->ubi_reg, $ubi));
+        
+        $nmtrabajador = RegistroCab::trabajador()->whereIn('emp_dep', $ubic);
+        
         foreach ($nmtrabajador as $key => $value) {
             $cedulas_nmtrab[] = $value->cedula;
             $nmtrab[$value->cedula] = $value->nombre;
         }
         
         $resultado = array_diff($cedulas_nmtrab, $this->cedula_reg);
-
+        
         if (count($resultado) >= 1) {
             $oso = $nmtrabajador;
         }
 
-        if ($this->recargar == 0) { 
-
+        if ($this->recargar == 0) {
             foreach ($this->data->registro_det as $key => $value) {
                 
-                $this->cant_trabaj[$value->cedula]   = $value->nombre;
-                $this->empr_trabaj[$value->cedula][] = $value->empresa;
-                $this->empr_trabaj[$value->cedula][] = $value->gerencia;
-                $this->empr_trabaj[$value->cedula][] = $value->ubicacion;
-                $this->comentario[$value->cedula]    = $value->comentario;
+                $this->cant_trabaj[$value->cedula]       = $value->nombre;
+                $this->empr_trabaj[$value->cedula][]     = $value->empresa;
+                $this->empr_trabaj[$value->cedula][]     = $value->gerencia;
+                $this->empr_trabaj[$value->cedula][]     = $value->ubicacion;
+                $this->comentario[$value->cedula]        = $value->comentario;
                 $this->adicionales_input[$value->cedula] = null;
+                $this->cab_reg[$this->id_reg][$value->cedula] = $value->nombre;
                 
                 foreach ($value->registro_sub as $key_sub => $val_sub) {
 
@@ -131,28 +138,70 @@ class RegistroEditComponent extends Component
             }
             //EXISTEN NUEVO TRABAJADOR
             if (count($resultado) >= 1) {
-
+                
                 foreach ($resultado as $key_resl => $val_resl) {
 
-                    $new_trab = RegistroCab::trabajador()->whereIn('cedula', $val_resl)->first();
-                    
-                    $this->comentario[$val_resl] = null;
-                    $this->adicionales_input[$val_resl] = null;
-                    $this->cant_trabaj[$val_resl] = $nmtrab[$val_resl];
+                    $new = RegistroCab::where('fecha', $this->data->fecha)
+                            ->whereHas('registro_det', function($q) use ($val_resl){
+                                $q->where('cedula',$val_resl);
+                            })->with(['registro_det.registro_sub', 'registro_det'=>function ($a) use ($val_resl){
+                                $a->where('cedula', $val_resl);
+                            }])
+                            ->get();
 
-                    $this->empr_trabaj[$val_resl][] = $new_trab->empresa;
-                    $this->empr_trabaj[$val_resl][] = $new_trab->depto;
-                    $this->empr_trabaj[$val_resl][] = $new_trab->ubicacion;
-                    
-                    foreach ($evaluaciones as $key => $evaluacion) {
-                        $this->asistencia_input[$val_resl][$evaluacion->id_evaluacion] = null;
-                        $this->evaluacion[$val_resl][$evaluacion->id_evaluacion] = null;
-                        $this->error[$val_resl][$evaluacion->id_evaluacion] = 0;
-                    }
-                    
-                    foreach ($this->eval_reg as $key => $value) {                       
-                        $this->select_val[$val_resl] = '0_'.$val_resl;
-                        $this->input_sel[$val_resl]  = null;
+                    if (count($new) == 0) {
+                        
+                        $new_trab = RegistroCab::trabajador()->whereIn('cedula', $val_resl)->first();
+                        $this->cab_reg['new'][$val_resl] = $nmtrab[$val_resl];
+
+                        $this->comentario[$val_resl] = null;
+                        $this->adicionales_input[$val_resl] = null;
+                        $this->cant_trabaj[$val_resl] = $nmtrab[$val_resl];
+                        
+                        $this->empr_trabaj[$val_resl][] = $new_trab->empresa;
+                        $this->empr_trabaj[$val_resl][] = $new_trab->depto;
+                        $this->empr_trabaj[$val_resl][] = $new_trab->ubicacion;
+                        
+                        foreach ($evaluaciones as $key => $evaluacion) {
+                            $this->asistencia_input[$val_resl][$evaluacion->id_evaluacion] = null;
+                            $this->evaluacion[$val_resl][$evaluacion->id_evaluacion] = null;
+                            $this->error[$val_resl][$evaluacion->id_evaluacion] = 0;
+                        }
+                        
+                        foreach ($this->eval_reg as $key => $value) {                       
+                            $this->select_val[$val_resl] = '0_'.$val_resl;
+                            $this->input_sel[$val_resl]  = null;
+                        }
+                    }else{
+                        $registros_det = $new[0]->registro_det[0];
+
+                        $this->cab_reg[$new[0]->id_registro][$registros_det->cedula] = $registros_det->nombre;
+                        $this->empr_trabaj[$registros_det->cedula][]     = $registros_det->empresa;
+                        $this->empr_trabaj[$registros_det->cedula][]     = $registros_det->gerencia;
+                        $this->empr_trabaj[$registros_det->cedula][]     = $registros_det->ubicacion;
+                        $this->comentario[$registros_det->cedula]        = $registros_det->comentario;
+                        $this->adicionales_input[$registros_det->cedula] = null;
+
+                        foreach ($registros_det->registro_sub as $key_sub => $val_sub) {
+
+                            $this->error[$registros_det->cedula][$val_sub->id_evaluacion] = 0;
+                            $this->evaluacion[$registros_det->cedula][$val_sub->id_evaluacion] = ($val_sub->resultado != 0) ? $val_sub->resultado : null;
+                            
+                            if ($val_sub->id_evaluacion == 1) {
+                                $this->input_sel[$registros_det->cedula] = $val_sub->resultado;
+                                if ($val_sub->resultado === '0') {
+                                    $this->select_val[$registros_det->cedula] = '0_'.$registros_det->cedula;
+                                    $this->evaluacion[$registros_det->cedula][1] = 0;
+                                }elseif ($val_sub->resultado === '1') {
+                                    $this->select_val[$registros_det->cedula] = '1_'.$registros_det->cedula;
+                                    $this->evaluacion[$registros_det->cedula][1] = 1;
+                                }else {
+                                    $id_eva = Evaluacion::where('abrv', $val_sub->resultado)->first();    
+                                    $this->select_val[$registros_det->cedula] = $id_eva->id_evaluacion.'_'.$registros_det->cedula;
+                                    $this->evaluacion[$registros_det->cedula][1] = $id_eva->id_evaluacion;
+                                }
+                            }
+                        }
                     }
                 }
 
@@ -161,7 +210,7 @@ class RegistroEditComponent extends Component
                     $this->cant_trabaj[$key] = $value;
                 }
             }
-            $this->resumen_edit = RegistroCab::resumenEdit($this->id_reg, $ubi);
+            $this->resumen_edit = RegistroCab::resumenEdit($this->id_reg, $ubic);
         }
         
         return view('livewire.registro.registro-edit-component', compact('evaluaciones', 'select', 'oso'))
@@ -254,6 +303,17 @@ class RegistroEditComponent extends Component
 
     public function evaluacion($cedula, $id_evaluacion)
     {
+        foreach ($this->cab_reg as $id_cab => $datos) {
+
+            if ($id_cab == 'new') {
+                $clave = 0;
+            }else{
+                if (array_key_exists($cedula, $datos)) {
+                    $clave = $id_cab;
+                }
+            }
+        }
+        
         $this->recargar = 1;
 
         $maximo = Evaluacion::find($id_evaluacion)->max;
@@ -263,7 +323,7 @@ class RegistroEditComponent extends Component
                 ->with(["registro_sub" => function($q) use ($id_evaluacion){
                     $q->where('id_evaluacion', '=', $id_evaluacion);
                 }]);
-            }])->find($this->id_reg);
+            }])->find($clave);
         
         if (is_numeric($this->evaluacion[$cedula][$id_evaluacion]) || $this->evaluacion[$cedula][$id_evaluacion] == "") {
             
@@ -345,50 +405,67 @@ class RegistroEditComponent extends Component
         
         try {
             DB::beginTransaction();
-        
-            $registro_cab               = RegistroCab::with('registro_det.registro_sub.evalua')->find($this->id_reg);
-            $registro_cab->id           = Auth::user()->id;
-            $registro_cab->observacion  = $this->observacion;
-            $registro_cab->id_estado    = $estado;
-            $registro_cab->save();
             
-            foreach ($this->cant_trabaj as $cedula => $value) {
-                
-                $det = RegistroDet::where('id_registro',$this->id_reg)->where('cedula',$cedula)->first();
-                
-                if (isset($det)) {
-                    $registro_det                =RegistroDet::find($det->id_reg_det);
+            foreach ($this->cab_reg as $id_cab => $datos) {
+
+                if ($id_cab == 'new') {
+                    $registro_cab  = new RegistroCab();
                 }else{
-                    $registro_det                = new RegistroDet();
+                    $registro_cab = RegistroCab::with('registro_det.registro_sub')->find($id_cab);
                 }
-                $registro_det->id_registro   = $this->id_reg;
-                $registro_det->cedula        = $cedula;
-                $registro_det->nombre        = $value;
-                $registro_det->comentario    = $this->comentario[$cedula];
-                $registro_det->empresa       = $this->empr_trabaj[$cedula][0];
-                $registro_det->gerencia      = $this->empr_trabaj[$cedula][1];
-                $registro_det->ubicacion     = $this->empr_trabaj[$cedula][2];
-                $registro_det->save();
                 
-                foreach ($evaluacion[$cedula] as $id_eval => $resul) {
-
-                    $sub = RegistroSubdet::where('id_registro',$this->id_reg)->where('id_reg_det',$registro_det->id_reg_det)
-                    ->where('id_evaluacion',$id_eval)->first();
+                $registro_cab->id           = Auth::user()->id;
+                $registro_cab->observacion  = $this->observacion;
+                $registro_cab->id_estado    = $estado;
+                $registro_cab->save();
                 
-                    if (isset($sub)) {
-                        $registro_sub                = RegistroSubdet::find($sub->id_reg_sub);
+                foreach ($datos as $cedula => $nombre) {
+                    
+                    if ($id_cab == 'new') {
+                        $registro_det        = new RegistroDet();
                     }else{
-                        $registro_sub                = new RegistroSubdet();
-                    }
 
-                    $registro_sub->id_registro      = $this->id_reg;
-                    $registro_sub->id_reg_det       = $registro_det->id_reg_det;
-                    $registro_sub->id_evaluacion    = $id_eval;
-                    $registro_sub->resultado        = ($resul == null) ? 0 : $resul;
-                    $registro_sub->save();
+                        $det                 = RegistroDet::where('id_registro',$id_cab)->where('cedula',$cedula)->first();
+                        if (isset($det)) {
+                            $registro_det    = RegistroDet::find($det->id_reg_det);
+                        }else{
+                            $registro_det    = new RegistroDet();
+                        }
+                    }
+                    
+                    $registro_det->id_registro   = $id_cab;
+                    $registro_det->cedula        = $cedula;
+                    $registro_det->nombre        = $nombre;
+                    $registro_det->comentario    = $this->comentario[$cedula];
+                    $registro_det->empresa       = $this->empr_trabaj[$cedula][0];
+                    $registro_det->gerencia      = $this->empr_trabaj[$cedula][1];
+                    $registro_det->ubicacion     = $this->empr_trabaj[$cedula][2];
+                    $registro_det->save();
+                    
+                    foreach ($evaluacion[$cedula] as $id_eval => $resul) {
+
+                        if ($id_cab == 'new') {
+                            $registro_sub   = new RegistroSubdet();
+                        }else{
+    
+                            $sub = RegistroSubdet::where('id_registro',$id_cab)->where('id_reg_det',$registro_det->id_reg_det)
+                                ->where('id_evaluacion',$id_eval)->first();
+                            
+                            if (isset($sub)) {
+                                $registro_sub  = RegistroSubdet::find($sub->id_reg_sub);
+                            }else{
+                                $registro_sub  = new RegistroSubdet();
+                            }
+                        }
+                        
+                        $registro_sub->id_registro      = $id_cab;
+                        $registro_sub->id_reg_det       = $registro_det->id_reg_det;
+                        $registro_sub->id_evaluacion    = $id_eval;
+                        $registro_sub->resultado        = ($resul == null) ? 0 : $resul;
+                        $registro_sub->save();
+                    }
                 }
             }
-
             DB::commit();
             return redirect()->to('/historico/show/'.$this->id_reg.'');
         } catch (\Throwable $th) {
