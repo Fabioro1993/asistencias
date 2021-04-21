@@ -42,7 +42,10 @@
                                     <td>{{$registro->responsable->name}}</td>
                                     <td>{{$registro->observacion}}</td>
                                     <td>
-                                        @if ($registro->id_estado == 3)
+                                        @if ($registro->id_estado == 3 && 
+                                        ($registro->id == Auth::user()->id
+                                         || Auth::user()->id_rol == 1 
+                                         || Auth::user()->id_rol == 2))
                                         <a href="{{ url('/historico/edit/'.$registro->id_registro.'')  }}"
                                             class="btn-floating waves-effect waves-light cyan lightrn-1">
                                             <i class="material-icons">mode_edit</i>

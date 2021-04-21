@@ -30,7 +30,8 @@
                     </div>
                 </div>
                 <div class="col s12 m5 quick-action-btns display-flex justify-content-end align-items-center pt-2">
-                    @if ($data->id_estado == 3)
+                    @if ($data->id_estado == 3 && 
+                        ($data->id == Auth::user()->id || Auth::user()->id_rol == 1 || Auth::user()->id_rol == 2))
                     <a href="{{ url('/historico/edit/'.$data->id_registro.'')  }}" class="btn-small indigo">Edit</a>
                     @else
                     <span class=" users-view-status chip green lighten-5 green-text">{{$data->estado->estado}}</span>

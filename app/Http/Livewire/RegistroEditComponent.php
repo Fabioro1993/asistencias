@@ -21,6 +21,7 @@ class RegistroEditComponent extends Component
     public $dept; 
     public $error = array();
 
+    public $activo = array(); 
     public $cab_reg = array();
     public $comentario = array();
     public $evaluacion = array();
@@ -42,6 +43,7 @@ class RegistroEditComponent extends Component
 
             foreach ($evaluaciones as $key => $evaluacion) {
                 $this->asistencia_input[$value->cedula][$evaluacion->id_evaluacion] = null;
+                $this->activo[$value->cedula] = '';
             }
         }
 
@@ -167,6 +169,7 @@ class RegistroEditComponent extends Component
                             $this->asistencia_input[$val_resl][$evaluacion->id_evaluacion] = null;
                             $this->evaluacion[$val_resl][$evaluacion->id_evaluacion] = null;
                             $this->error[$val_resl][$evaluacion->id_evaluacion] = 0;
+                            $this->activo[$val_resl] = '';
                         }
                         
                         foreach ($this->eval_reg as $key => $value) {                       
@@ -189,7 +192,6 @@ class RegistroEditComponent extends Component
                             $this->evaluacion[$registros_det->cedula][$val_sub->id_evaluacion] = ($val_sub->resultado != 0) ? $val_sub->resultado : null;
                             
                             if ($val_sub->id_evaluacion == 1) {
-                                $this->input_sel[$registros_det->cedula] = $val_sub->resultado;
                                 if ($val_sub->resultado === '0') {
                                     $this->select_val[$registros_det->cedula] = '0_'.$registros_det->cedula;
                                     $this->evaluacion[$registros_det->cedula][1] = 0;
@@ -201,6 +203,11 @@ class RegistroEditComponent extends Component
                                     $this->select_val[$registros_det->cedula] = $id_eva->id_evaluacion.'_'.$registros_det->cedula;
                                     $this->evaluacion[$registros_det->cedula][1] = $id_eva->id_evaluacion;
                                 }
+                            }
+                            if ($new[0]->id_estado == 4) {
+                                $this->activo[$val_resl] = 'disabled';
+                            }else{
+                                $this->activo[$val_resl] = '';
                             }
                         }
                     }
@@ -397,8 +404,21 @@ class RegistroEditComponent extends Component
 
     public function update($estado)
     {
-        $select = $this->input_sel;
+        $eliminar = array_filter($this->activo);
         $evaluacion = $this->evaluacion;
+        foreach ($eliminar as $key => $value) {
+            unset($evaluacion[$key]);
+            unset($this->adicionales_input[$key]);
+        }
+
+        foreach ($this->cab_reg as $key => $value) {
+            foreach ($eliminar as $cedula => $elim) {
+                unset($value[$cedula]);
+            }
+            $this->cab_reg[$key] = $value;
+        }
+        $this->cab_reg = array_filter($this->cab_reg);
+        $select = $this->input_sel;
         foreach ($this->adicionales_input as $key => $value) {
             $evaluacion[$key][1] = ($select[$key] == null) ? 0 : $select[$key];
             $evaluacion[$key][9] = ($value == null) ? 0 : $value ;
