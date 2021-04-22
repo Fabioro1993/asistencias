@@ -11,7 +11,7 @@
                 </div>
             </div>
             <div class="col s12 m5 quick-action-btns display-flex justify-content-end align-items-center pt-2">
-                <a href="{{url('nomina/resumen/pdf/'.$id_reg)}}" target="_blank" class="btn-small indigo">PDF</a>
+                <a href="{{url('nomina/resumen/pdf/'.$quincena.'/'.$mes.'/'.$anio)}}" target="_blank" class="btn-small indigo">PDF</a>
             </div>                
         </div>
     </div>

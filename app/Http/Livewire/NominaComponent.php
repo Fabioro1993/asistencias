@@ -34,6 +34,7 @@ class NominaComponent extends Component
         
         $data = RegistroCab::select(DB::raw('MONTH(fecha) mes, IF( DAY(fecha)<=15,"I","II") AS quincena'),
                              DB::raw('YEAR(fecha) anio'))
+                            ->where('id_estado', 4)
                             ->groupby('quincena','mes', 'anio')->get();
 
         foreach ($data as $key => $value) {

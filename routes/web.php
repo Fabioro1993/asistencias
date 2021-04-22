@@ -35,4 +35,4 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/registro', RegistroCompon
 
 Route::middleware(['auth:sanctum', 'verified'])->get('/nomina', NominaComponent::class)->name('nomina');
 Route::middleware(['auth:sanctum', 'verified'])->get('/nomina/resumen/{quincena}/{mes}/{anio}', NominaResumenComponent::class)->name('nomina/resumen/{quincena}/{mes}/{anio}');
-Route::middleware(['auth:sanctum', 'verified'])->get('/nomina/resumen/pdf/{id}', [NominaResumenComponent::class, 'pdf']);
+Route::middleware(['auth:sanctum', 'verified'])->get('/nomina/resumen/pdf/{quincena}/{mes}/{anio}', [NominaResumenComponent::class, 'pdf']);

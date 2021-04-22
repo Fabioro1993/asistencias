@@ -58,16 +58,16 @@ class NominaResumenComponent extends Component
         ];
         //Pageheader set true for breadcrumbs
         $pageConfigs = ['pageHeader' => true];
-
-        $resumen = RegistroCab::resumenNomina($this->id_reg);
+        
+        $resumen = RegistroCab::resumenNomina($this->quincena, $this->mes, $this->anio);
 
         return view('livewire.nomina.nomina-resumen-component', compact('resumen'))
                 ->layout('layouts.contentLayoutMaster', compact('pageConfigs', 'breadcrumbs'));
     }
 
-    public function pdf($id)
+    public function pdf($quincena, $mes, $anio)
     {
-        $resumen = RegistroCab::resumenNomina($id);
+        $resumen = RegistroCab::resumenNomina($quincena, $mes, $anio);
 
         $dept = Nmdpto::dptoArray();
         

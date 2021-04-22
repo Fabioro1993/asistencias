@@ -366,19 +366,30 @@ class RegistroCab extends Model
         return $data;
     }
 
-    public function scopeResumenNomina($query, $id_reg)
+    public function scopeResumenNomina($query, $quincena, $mes, $anio)
     {
-        $registro_cab = RegistroCab::with(["registro_det" => function($a){
-                        $a->orderby('empresa', 'asc');
-                    }])->find($id_reg);
+        $registro_det =  RegistroDet::with(["registro_cab" => function($a) use ($mes, $anio, $quincena){
+                                        $a->whereMonth('fecha', $mes)
+                                        ->whereYear('fecha', $anio);
+                                        if ($quincena == 'I') {
+                                            $a = $a->whereDay('fecha', '<=',15);
+                                        }else{
+                                            $a = $a->whereDay('fecha', '>',15);
+                                        }
+                                    }])->orderby('empresa', 'asc')
+                                    ->orderby('cedula', 'asc')
+                                    ->get();
         
-        $fecha_max = RegistroCab::fechaMax($registro_cab->fecha);
+        $fecha =  $registro_det[0]->registro_cab->fecha;
 
-        $mes = date("m", strtotime($registro_cab->fecha));
+        $fecha_max = RegistroCab::fechaMax($fecha);
 
-        $fin_sem = RegistroCab::finSemana($registro_cab->fecha);
+        $fin_sem = RegistroCab::finSemana($fecha);
+
+        $registro_det = $registro_det->groupby('cedula');
         
-        foreach ($registro_cab->registro_det as $key => $det) {
+        foreach ($registro_det as $cedula => $detalle) {
+            $det = $detalle[0];
             
             $trab_empresa[$det->cedula]   = $det->empresa;
 
