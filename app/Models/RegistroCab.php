@@ -224,7 +224,7 @@ class RegistroCab extends Model
                 $resumen_vacacion[$value->cedula]     = null;
                 $resumen_reposo[$value->cedula]       = null;
                 $resumen_permiso[$value->cedula]      = null;
-                $adicionales[$value->cedula]          = null;
+                $resumen_adicionales[$value->cedula]          = null;
             }
 
             $hist_gd_adicional = RegistroCab::guardiaAdional($value->cedula, $mes);
@@ -232,11 +232,11 @@ class RegistroCab extends Model
             if (count($hist_gd_adicional) > 0) {
                 foreach ($hist_gd_adicional as $key => $val_adic) {
                     if ($val_adic->id_evaluacion == 11) {
-                        $adicionales[$value->cedula]  = ($val_adic->asistencia != 0) ? $val_adic->asistencia : null;
+                        $resumen_adicionales[$value->cedula]  = ($val_adic->asistencia != 0) ? $val_adic->asistencia : null;
                     }
                 }
             }else{
-                $adicionales[$value->cedula]   = null;
+                $resumen_adicionales[$value->cedula]   = null;
             }
 
             $sabado = $fin_sem['sabado'];
@@ -277,7 +277,7 @@ class RegistroCab extends Model
                     $resumen_hx_diurna[$val_resl] = null;
                     $resumen_hx_nocturna[$val_resl] = null;
                     $bono_nocturno[$val_resl] = null;
-                    $adicionales[$val_resl] =  null;          
+                    $resumen_adicionales[$val_resl] =  null;          
                     $resumen_gd_sabado[$val_resl] = null;               
                     $resumen_gd_domingo[$val_resl] = null;
                     $resumen_reposo[$val_resl] = null;
@@ -317,7 +317,7 @@ class RegistroCab extends Model
                         $resumen_vacacion[$registros_det->cedula]     = null;
                         $resumen_reposo[$registros_det->cedula]       = null;
                         $resumen_permiso[$registros_det->cedula]      = null;
-                        $adicionales[$registros_det->cedula]          = null;
+                        $resumen_adicionales[$registros_det->cedula]          = null;
                     }
 
                     $hist_gd_adicional = RegistroCab::guardiaAdional($registros_det->cedula, $mes);
@@ -325,11 +325,11 @@ class RegistroCab extends Model
                     if (count($hist_gd_adicional) > 0) {
                         foreach ($hist_gd_adicional as $key => $val_adic) {
                             if ($val_adic->id_evaluacion == 11) {
-                                $adicionales[$value->cedula]  = ($val_adic->asistencia != 0) ? $val_adic->asistencia : null;
+                                $resumen_adicionales[$value->cedula]  = ($val_adic->asistencia != 0) ? $val_adic->asistencia : null;
                             }
                         }
                     }else{
-                        $adicionales[$registros_det->cedula]   = null;
+                        $resumen_adicionales[$registros_det->cedula]   = null;
                     }
 
                     $sabado = $fin_sem['sabado'];
@@ -356,7 +356,7 @@ class RegistroCab extends Model
         $data['resumen_hx_diurna'] = $resumen_hx_diurna;
         $data['resumen_hx_nocturna'] = $resumen_hx_nocturna;
         $data['bono_nocturno'] = $bono_nocturno;
-        $data['adicionales'] = $adicionales;                
+        $data['resumen_adicionales'] = $resumen_adicionales;                
         $data['resumen_gd_sabado'] = $resumen_gd_sabado;               
         $data['resumen_gd_domingo'] = $resumen_gd_domingo;
         $data['resumen_reposo'] = $resumen_reposo;

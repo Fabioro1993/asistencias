@@ -400,6 +400,7 @@ class RegistroEditComponent extends Component
     {
         $this->recargar = 1;
         $this->adicionales_input[$cedula] = $this->adicionales[$cedula];
+        $this->resumen_edit['resumen_adicionales'][$cedula] = $this->adicionales[$cedula];
     }
 
     public function update($estado)
