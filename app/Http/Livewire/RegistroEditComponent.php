@@ -120,7 +120,7 @@ class RegistroEditComponent extends Component
                 $this->empr_trabaj[$value->cedula][]     = $value->gerencia;
                 $this->empr_trabaj[$value->cedula][]     = $value->ubicacion;
                 $this->comentario[$value->cedula]        = $value->comentario;
-                $this->adicionales_input[$value->cedula] = null;
+                
                 $this->cab_reg[$this->id_reg][$value->cedula] = $value->nombre;
                 
                 foreach ($value->registro_sub as $key_sub => $val_sub) {
@@ -144,6 +144,7 @@ class RegistroEditComponent extends Component
                     }
                     if ($val_sub->id_evaluacion == 9) {
                         $this->adicionales[$value->cedula] = ($val_sub->resultado != 0) ? $val_sub->resultado : null;
+                        $this->adicionales_input[$value->cedula] = ($val_sub->resultado != 0) ? $val_sub->resultado : null;
                     }
                 }
             }
@@ -420,7 +421,7 @@ class RegistroEditComponent extends Component
             unset($evaluacion[$key]);
             unset($this->adicionales_input[$key]);
         }
-
+       
         foreach ($this->cab_reg as $key => $value) {
             foreach ($eliminar as $cedula => $elim) {
                 unset($value[$cedula]);
@@ -476,6 +477,8 @@ class RegistroEditComponent extends Component
                     $registro_det->save();
                     
                     foreach ($evaluacion[$cedula] as $id_eval => $resul) {
+
+                        //dd($this->adicionales_input, $evaluacion[$cedula], $id_eval, $resul);
 
                         if ($id_cab == 'new') {
                             $registro_sub        = new RegistroSubdet();
