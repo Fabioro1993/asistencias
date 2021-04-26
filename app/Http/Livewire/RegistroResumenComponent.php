@@ -35,6 +35,7 @@ class RegistroResumenComponent extends Component
         $fecha_max = RegistroCab::fechaMax($registro_cab->fecha);
 
         $mes = date("m", strtotime($registro_cab->fecha));
+        $anio = date("Y", strtotime($registro_cab->fecha));
 
         $fin_sem = RegistroCab::finSemana($registro_cab->fecha);
         
@@ -42,7 +43,7 @@ class RegistroResumenComponent extends Component
 
             $this->resumen_gd_totales[$value->cedula]   = null;
             
-            $hist_regi = RegistroCab::historico($mes, $value->cedula);
+            $hist_regi = RegistroCab::historico($fecha_max, $value->cedula);
             
             if (count($hist_regi) > 0) {
                 foreach ($hist_regi as $key => $value) {
@@ -88,11 +89,11 @@ class RegistroResumenComponent extends Component
             }
 
             $sabado = $fin_sem['sabado'];
-            $resumen_sabado = RegistroCab::resumenFinSemana($value->cedula, $sabado, $mes);
+            $resumen_sabado = RegistroCab::resumenFinSemana($value->cedula, $sabado, $fecha_max);
             $this->resumen_gd_sabado[$value->cedula] = ($resumen_sabado != 0) ? $resumen_sabado : null;
 
             $domingo = $fin_sem['domingo'];
-            $resumen_domingo = RegistroCab::resumenFinSemana($value->cedula, $domingo, $mes);
+            $resumen_domingo = RegistroCab::resumenFinSemana($value->cedula, $domingo, $fecha_max);
             $this->resumen_gd_domingo[$value->cedula] = ($resumen_domingo != 0) ? $resumen_domingo : null;
         }
 

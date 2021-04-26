@@ -143,7 +143,7 @@ class RegistroEditComponent extends Component
                         }
                     }
                     if ($val_sub->id_evaluacion == 9) {
-                        $this->adicionales[$value->cedula] = $val_sub->resultado;
+                        $this->adicionales[$value->cedula] = ($val_sub->resultado != 0) ? $val_sub->resultado : null;
                     }
                 }
             }

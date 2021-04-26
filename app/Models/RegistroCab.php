@@ -71,8 +71,20 @@ class RegistroCab extends Model
 
     }
     
-    public function scopeHistorico($query, $mes, $cedula)
+    public function scopeHistorico($query, $fecha, $cedula)
     {
+        $anio = date("Y", strtotime($fecha));
+        $mes = date("m", strtotime($fecha));
+        $dia = date("d", strtotime($fecha));
+        
+        if ($fecha <= date("Y-m-15", strtotime(date($anio.'-'.$mes.'-'.$dia)))) {
+            $min = date("Y-m-1", strtotime(date($anio.'-'.$mes.'-'.$dia)));
+            $max = date("Y-m-15", strtotime(date($anio.'-'.$mes.'-'.$dia)));
+        }else{
+            $min = date("Y-m-16", strtotime(date($anio.'-'.$mes.'-'.$dia)));
+            $max = date("Y-m-t", strtotime(date($anio.'-'.$mes.'-'.$dia)));
+        }
+
         $hist_regi = DB::table('registros_subdet')
                 ->select(
                     DB::raw('SUM(resultado) as asistencia,
@@ -83,8 +95,10 @@ class RegistroCab extends Model
                     'id_evaluacion', 'registros_det.cedula')
                 ->join('registros_det', 'registros_subdet.id_reg_det', '=', 'registros_det.id_reg_det')
                 ->join('registros_cab', 'registros_det.id_registro', '=', 'registros_cab.id_registro')
-                ->whereMonth('fecha', $mes)
+                // ->whereMonth('fecha', $mes)
+                // ->whereYear('fecha', $anio)
                 ->where('cedula', $cedula)
+                ->whereBetween('fecha', [$min, $max])
                 ->groupBy('id_evaluacion', 'cedula')
                 ->get();
 
@@ -127,14 +141,27 @@ class RegistroCab extends Model
 
     public function scopeResumenFinSemana($query, $cedula, $dia, $fecha)
     {
-        $mes   = ($fecha == null) ? date("m") : $fecha;
+        $fecha_prop   = ($fecha == null) ? date("Y-m-d") : $fecha;
+
+        $anio = date("Y", strtotime($fecha_prop));
+        $mes = date("m", strtotime($fecha_prop));
+        $dias = date("d", strtotime($fecha_prop));
+
+        if ($fecha_prop <= date("Y-m-15", strtotime(date($anio.'-'.$mes.'-'.$dias)))) {
+            $min = date("Y-m-1", strtotime(date($anio.'-'.$mes.'-'.$dias)));
+            $max = date("Y-m-15", strtotime(date($anio.'-'.$mes.'-'.$dias)));
+        }else{
+            $min = date("Y-m-16", strtotime(date($anio.'-'.$mes.'-'.$dias)));
+            $max = date("Y-m-t", strtotime(date($anio.'-'.$mes.'-'.$dias)));
+        }
         
         $calculo = DB::table('registros_subdet')
                     ->select(  DB::raw('SUM(resultado) as asistencia'), 'id_evaluacion', 'registros_det.cedula')
                     ->join('registros_det', 'registros_subdet.id_reg_det', '=', 'registros_det.id_reg_det')
                     ->join('registros_cab', 'registros_det.id_registro', '=', 'registros_cab.id_registro')
-                    ->whereMonth('fecha', $mes)
-                    ->where('cedula', $cedula)
+                    ->whereBetween('fecha', [$min, $max])
+                    // ->whereMonth('fecha', $mes)
+                    // ->where('cedula', $cedula)
                     ->where('id_evaluacion', 1)
                     ->where(function($q) use($dia) {                    
                         foreach ($dia as $day) {
@@ -188,13 +215,15 @@ class RegistroCab extends Model
 
         $mes = date("m", strtotime($registro_cab->fecha));
 
+        $anio = date("m", strtotime($registro_cab->fecha));
+
         $fin_sem = RegistroCab::finSemana($registro_cab->fecha);
         
         foreach ($registro_cab->registro_det as $key => $value) {
 
             $resumen_gd_totales[$value->cedula]   = null;
             
-            $hist_regi = RegistroCab::historico($mes, $value->cedula);
+            $hist_regi = RegistroCab::historico($fecha_max, $value->cedula);
             
             if (count($hist_regi) > 0) {
                 foreach ($hist_regi as $key => $value) {
@@ -243,11 +272,11 @@ class RegistroCab extends Model
             }
 
             $sabado = $fin_sem['sabado'];
-            $resumen_sabado = RegistroCab::resumenFinSemana($value->cedula, $sabado, $mes);
+            $resumen_sabado = RegistroCab::resumenFinSemana($value->cedula, $sabado, $fecha_max);
             $resumen_gd_sabado[$value->cedula] = ($resumen_sabado != 0) ? $resumen_sabado : null;
             
             $domingo = $fin_sem['domingo'];
-            $resumen_domingo = RegistroCab::resumenFinSemana($value->cedula, $domingo, $mes);
+            $resumen_domingo = RegistroCab::resumenFinSemana($value->cedula, $domingo, $fecha_max);
             $resumen_gd_domingo[$value->cedula] = ($resumen_domingo != 0) ? $resumen_domingo : null;
         }
         
@@ -290,7 +319,7 @@ class RegistroCab extends Model
 
                     $resumen_gd_totales[$registros_det->cedula]   = null;
             
-                    $hist_regi = RegistroCab::historico($mes, $registros_det->cedula);
+                    $hist_regi = RegistroCab::historico($fecha_max, $registros_det->cedula);
                     
                     if (count($hist_regi) > 0) {
                         foreach ($hist_regi as $key => $val_ht) {
@@ -309,6 +338,9 @@ class RegistroCab extends Model
                             }
                             if ($val_ht->id_evaluacion == 4) {
                                 $bono_nocturno[$val_ht->cedula]        = ($val_ht->asistencia != 0) ? $val_ht->asistencia : null;
+                            }
+                            if ($value->id_evaluacion == 9) {
+                                $resumen_adicionales[$value->cedula]  = ($value->asistencia != 0) ? $value->asistencia : null;
                             }
                         }
                     }else{
@@ -336,11 +368,11 @@ class RegistroCab extends Model
                     }
 
                     $sabado = $fin_sem['sabado'];
-                    $resumen_sabado = RegistroCab::resumenFinSemana($registros_det->cedula, $sabado, $mes);
+                    $resumen_sabado = RegistroCab::resumenFinSemana($registros_det->cedula, $sabado, $fecha_max);
                     $resumen_gd_sabado[$registros_det->cedula] = ($resumen_sabado != 0) ? $resumen_sabado : null;
                     
                     $domingo = $fin_sem['domingo'];
-                    $resumen_domingo = RegistroCab::resumenFinSemana($registros_det->cedula, $domingo, $mes);
+                    $resumen_domingo = RegistroCab::resumenFinSemana($registros_det->cedula, $domingo, $fecha_max);
                     $resumen_gd_domingo[$registros_det->cedula] = ($resumen_domingo != 0) ? $resumen_domingo : null;
                 }
             }
@@ -400,7 +432,7 @@ class RegistroCab extends Model
             
             $resumen_gd_totales[$det->gerencia][$det->cedula]   = null;
         
-            $hist_regi = RegistroCab::historico($mes, $det->cedula);
+            $hist_regi = RegistroCab::historico($fecha_max, $det->cedula);
              
             if (count($hist_regi) > 0) {
                 foreach ($hist_regi as $key => $value) {
@@ -420,6 +452,9 @@ class RegistroCab extends Model
                     }
                     if ($value->id_evaluacion == 4) {
                         $bono_nocturno[$det->gerencia][$value->cedula]        = ($value->asistencia != 0) ? $value->asistencia : null;
+                    }
+                    if ($value->id_evaluacion == 9) {
+                        $adicionales[$det->gerencia][$value->cedula]          = ($value->asistencia != 0) ? $value->asistencia : null;
                     }
                 }
             }else{
@@ -447,11 +482,11 @@ class RegistroCab extends Model
             }
 
             $sabado = $fin_sem['sabado'];
-            $resumen_sabado = RegistroCab::resumenFinSemana($det->cedula, $sabado, $mes);
+            $resumen_sabado = RegistroCab::resumenFinSemana($det->cedula, $sabado, $fecha_max);
             $resumen_gd_sabado[$det->gerencia][$det->cedula] = ($resumen_sabado != 0) ? $resumen_sabado : null;
 
             $domingo = $fin_sem['domingo'];
-            $resumen_domingo = RegistroCab::resumenFinSemana($det->cedula, $domingo,$mes);
+            $resumen_domingo = RegistroCab::resumenFinSemana($det->cedula, $domingo,$fecha_max);
             $resumen_gd_domingo[$det->gerencia][$det->cedula] = ($resumen_domingo != 0) ? $resumen_domingo : null;
         }
 

@@ -124,7 +124,7 @@ class RegistroComponent extends Component
                 $resumen_domingo = RegistroCab::resumenFinSemana($value->cedula, $domingo, null);
                 $this->resumen_gd_domingo[$value->cedula] = ($resumen_domingo != 0) ? $resumen_domingo : null;
 
-                $hist_regi = RegistroCab::historico(date("m"), $value->cedula);
+                $hist_regi = RegistroCab::historico($this->fecha_max, $value->cedula);
                 
                 if (count($hist_regi) > 0) {
                     foreach ($hist_regi as $key => $value) {
