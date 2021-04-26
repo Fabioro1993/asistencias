@@ -14,12 +14,7 @@ class RegistroShowComponent extends Component
 
     public function mount($id)
     {
-        $this->data = RegistroCab::with(["registro_det" => function($a){
-            $a->with(["registro_sub" => function($q){
-                $q->where('id_evaluacion', '!=', 9);
-            }]);
-        }])->find($id);
-
+        $this->data = RegistroCab::with("registro_det")->find($id);
     }
 
     public function render()
@@ -37,7 +32,7 @@ class RegistroShowComponent extends Component
             $det['text_geren'] = $this->dept[$det->gerencia];
         }
 
-        $evaluaciones = Evaluacion::whereIn('id_evaluacion', [1, 2, 3,4])->get();
+        $evaluaciones = Evaluacion::whereIn('id_evaluacion', [1, 2, 3, 4, 9])->get();
         
         return view('livewire.registro.registro-show-component', compact('data', 'evaluaciones'))
             ->layout('layouts.contentLayoutMaster', compact('pageConfigs', 'breadcrumbs'));

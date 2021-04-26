@@ -36,7 +36,7 @@ class RegistroEditComponent extends Component
         $this->data    = RegistroCab::with('registro_det.registro_sub.evalua')->find($id);
         $this->fecha   = RegistroCab::find($id)->fecha;
         $evaluaciones  = Evaluacion::whereIn('id_evaluacion', [1, 2, 3,4])->get();
-        
+
         foreach ($this->data->registro_det as $key => $value) {
             $this->cedula_reg[] = $value->cedula;
             $this->ubi_reg[]    = $value->empresa.'_'.$value->gerencia.'_'.$value->ubicacion;
@@ -77,12 +77,16 @@ class RegistroEditComponent extends Component
         $this->observacion  = $this->data->observacion;
         $evaluaciones       = Evaluacion::whereIn('id_evaluacion', [1, 2, 3,4])->get();
         $select             = Evaluacion::whereIn('id_evaluacion', [5,6,7,8])->get();
-           
+        $dpto               = Nmdpto::dptoArray();  
+
         //Guardias Adicionales
         if (date('d', strtotime($this->data->fecha)) == 15 || date('t', strtotime($this->data->fecha)) == date('d', strtotime($this->data->fecha))) {
             $this->hidden = '';
         }else{
             $this->hidden = 'hidden';
+        }
+        foreach ($this->data->registro_det as $key => $value) {
+            $value['descr'] = $dpto[$value->gerencia];
         }
 
         $oso = $this->data->registro_det;
@@ -108,6 +112,7 @@ class RegistroEditComponent extends Component
         }
 
         if ($this->recargar == 0) {
+
             foreach ($this->data->registro_det as $key => $value) {
                 
                 $this->cant_trabaj[$value->cedula]       = $value->nombre;
@@ -136,6 +141,9 @@ class RegistroEditComponent extends Component
                             $this->select_val[$value->cedula] = $id_eva->id_evaluacion.'_'.$value->cedula;
                             $this->evaluacion[$value->cedula][1] = $id_eva->id_evaluacion;
                         }
+                    }
+                    if ($val_sub->id_evaluacion == 9) {
+                        $this->adicionales[$value->cedula] = $val_sub->resultado;
                     }
                 }
             }
@@ -258,7 +266,6 @@ class RegistroEditComponent extends Component
         }
         
         //SUMO
-
         if ($porciones[0] == '0') { // SI ES CERO NO ELIMINO NADA pero guardo en el input
             $this->asistencia_input[$porciones[1]][1] = 0;
             $this->input_sel[$porciones[1]] = 0;
@@ -401,6 +408,8 @@ class RegistroEditComponent extends Component
         $this->recargar = 1;
         $this->adicionales_input[$cedula] = $this->adicionales[$cedula];
         $this->resumen_edit['resumen_adicionales'][$cedula] = $this->adicionales[$cedula];
+        $this->dispatchBrowserEvent('contentChanged');
+        
     }
 
     public function update($estado)

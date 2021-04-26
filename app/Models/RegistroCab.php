@@ -167,7 +167,7 @@ class RegistroCab extends Model
                     ->join('registros_cab', 'registros_det.id_registro', '=', 'registros_cab.id_registro')
                     ->whereMonth('fecha', $mes)
                     ->where('cedula', $cedula)
-                    ->where('id_evaluacion', 11)
+                    ->where('id_evaluacion', 9)
                     ->groupBy('id_evaluacion', 'cedula')
                     ->get();
         
@@ -213,6 +213,9 @@ class RegistroCab extends Model
                     }
                     if ($value->id_evaluacion == 4) {
                         $bono_nocturno[$value->cedula]        = ($value->asistencia != 0) ? $value->asistencia : null;
+                    }
+                    if ($value->id_evaluacion == 9) {
+                        $resumen_adicionales[$value->cedula]  = ($value->asistencia != 0) ? $value->asistencia : null;
                     }
                 }
             }else{
