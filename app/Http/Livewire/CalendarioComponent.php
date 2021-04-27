@@ -14,7 +14,7 @@ class CalendarioComponent extends Component
     {
         $registros = RegistroCab::with(["registro_det" => function($a){
                         $a->select('id_registro', 'empresa')
-                        ->groupby('empresa');
+                        ->groupby('id_registro', 'empresa');
                     }])
                     ->where('id_estado', 4)
                     ->get();
