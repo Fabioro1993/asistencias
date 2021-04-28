@@ -17,20 +17,12 @@
             </div>
         </div>        
         <div class="row">
-            <div class="col s12 m6">
+            <div class="col s12 m4">
                 <div class="row">
                     <div class="col s12 input-field">
                         <input id="new_name" type="text" value="{{$new_name}}" readonly>
                         <label for="new_name" class="active">Nombre</label>
                     </div>
-                    <div class="col s12 input-field">
-                        <input id="new_email" type="text" value="{{$new_email}}" readonly>
-                        <label for="new_email" class="active">Correo</label>
-                    </div>
-                </div>
-            </div>
-            <div class="col s12 m6">
-                <div class="row">
                     <div class="col s12 input-field" wire:ignore>
                         <select wire:model.defer="rol">
                             <option selected>Rol</option>
@@ -40,6 +32,14 @@
                         </select>
                         <label>Rol</label>
                     </div>
+                </div>
+            </div>
+            <div class="col s12 m4">
+                <div class="row">
+                    <div class="col s12 input-field">
+                        <input id="new_email" type="text" value="{{$new_email}}" readonly>
+                        <label for="new_email" class="active">Correo</label>
+                    </div>
                     <div class="col s12 input-field" wire:ignore>
                         <select wire:model.defer="estado">
                             <option selected>Estado</option>
@@ -48,7 +48,15 @@
                             @endforeach
                         </select>
                         <label>Estado</label>
-                    </div>
+                    </div>                   
+                </div>
+            </div>
+            <div class="col s12 m4">
+                <div class="row">
+                    <div class="col s12 input-field">
+                        <input wire:model.defer="new_cedula" id="new_cedula" type="number" required>
+                        <label for="new_cedula" class="active">Cedula</label>
+                    </div> 
                 </div>
             </div>
             <div class="col s12">

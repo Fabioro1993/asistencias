@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire;
 
+use App\Models\RegistroCab;
 use App\Models\Permisos;
 use App\Models\Rol;
 use App\Models\User;
@@ -17,7 +18,7 @@ use Illuminate\Support\Facades\DB;
 class UserRegistroComponent extends Component
 {
     //$id_usuario, $name, $email, $rol_id,  $estado_id,  $rol_input, $estado_input, $indicador, 
-    public $username, $new_name, $new_email, $estado, $rol, $permiso, $id_usuario,  $rol_input, $estado_input;
+    public $username, $new_name, $new_email, $estado, $rol, $permiso, $id_usuario,  $rol_input, $estado_input, $new_cedula;
     public $accion = 'ver';
 
     protected $listeners = ['editUser'];
@@ -57,18 +58,20 @@ class UserRegistroComponent extends Component
             DB::beginTransaction();
 
             $userldap = ldapUS::where('samaccountname', $this->username)->first();
-
+            
             $this->validate([
                 'username' => ['required', new NoNull($userldap), 'unique:users'],
                 'estado' => 'required',
                 'rol' => 'required', 
-                'permiso' => 'required',            
+                'permiso' => 'required',
+                'new_cedula' => 'required',            
             ]);
-        
+            
             $users              = new User();        
             $users->name        = $this->new_name;
             $users->username    = strtolower($this->username);
             $users->email       = $this->new_email;
+            $users->cedula      = $this->new_cedula;
             $users->id_estado   = $this->estado;
             $users->id_rol      = $this->rol;
             $users->guid        = $userldap->getConvertedGuid('objectguid');
@@ -92,7 +95,7 @@ class UserRegistroComponent extends Component
             }
     
             $this->accion = 'ver';
-            $this->reset(['estado', 'rol', 'new_email', 'username', 'new_name', 'permiso']); 
+            $this->reset(['estado', 'rol', 'new_email', 'username', 'new_name', 'permiso', 'new_cedula']); 
             $this->dispatchBrowserEvent('contentChanged'); //REINICIAR SELECT
 
             DB::commit();
@@ -108,6 +111,10 @@ class UserRegistroComponent extends Component
         try {
             DB::beginTransaction();
             $users = User::find($this->id_usuario);
+
+            if ($this->new_cedula != null) {
+                $users->cedula = $this->new_cedula;
+            }
 
             if ($this->rol_input != null) {
                 $users->id_rol = $this->rol_input;
@@ -151,7 +158,7 @@ class UserRegistroComponent extends Component
             
             DB::commit();
             $this->accion = 'ver';
-            $this->reset(['estado', 'rol', 'new_email', 'username', 'new_name']); 
+            $this->reset(['estado', 'rol', 'new_email', 'username', 'new_name', 'new_cedula']); 
             $this->dispatchBrowserEvent('contentChanged'); //REINICIAR SELECT
         } catch (\Throwable $th) {
             DB::rollback();
@@ -171,6 +178,7 @@ class UserRegistroComponent extends Component
         $this->new_name     = $usuario->name;
         $this->username     = $usuario->username;
         $this->new_email    = $usuario->email;
+        $this->new_cedula   = $usuario->cedula;
         $this->rol          = $usuario->id_rol;
         $this->estado       = $usuario->id_estado;
         $this->accion       = 'update';

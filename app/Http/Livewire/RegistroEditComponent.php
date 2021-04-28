@@ -97,8 +97,7 @@ class RegistroEditComponent extends Component
         
         //AGRUPO LAS GERENCIAS DEL USUARIO QUE EDITA CON LAS DEL REGISTRO CARGADO POR PRIMERA VEZ
         $ubic = array_unique(array_merge($this->ubi_reg, $ubi));
-        
-        $nmtrabajador = RegistroCab::trabajador()->whereIn('emp_dep', $ubic);
+        $nmtrabajador = RegistroCab::trabajador()->whereIn('emp_dep', $ubic)->where('cedula','!=' ,$user->cedula);
         
         foreach ($nmtrabajador as $key => $value) {
             $cedulas_nmtrab[] = $value->cedula;

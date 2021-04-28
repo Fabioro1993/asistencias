@@ -66,13 +66,13 @@ class RegistroComponent extends Component
         $pageConfigs = ['pageHeader' => true];
         
         $fin_sem = RegistroCab::finSemana(null);
-        $user = User::with('permiso')->find(Auth::user()->id);
+        $user = User::with('permiso')->find(Auth::user()->id);        
         foreach ($user->permiso as $key => $value) {
             $ubi[] = $value->empresa.'_'.$value->gerencia.'_'.$value->ubicacion;
         }
         
-        $this->oso = RegistroCab::trabajador()->whereIn('emp_dep', $ubi);
-        
+        $this->oso = RegistroCab::trabajador()->whereIn('emp_dep', $ubi)->where('cedula','!=' ,$user->cedula);
+
         $evaluaciones = Evaluacion::whereIn('id_evaluacion', [1, 2, 3,4])->get();
         $select       = Evaluacion::whereIn('id_evaluacion', [5,6,7,8])->get();
         

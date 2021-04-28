@@ -18,6 +18,7 @@ class CreateUsersTable extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->string('username')->unique();
+            $table->integer('cedula')->unique();
             $table->foreignId('id_estado')->references('id_estado')->on('estados');
             $table->foreignId('id_rol')->references('id_rol')->on('roles');
             $table->timestamp('email_verified_at')->nullable();
